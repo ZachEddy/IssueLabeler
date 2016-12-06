@@ -32,7 +32,6 @@ class Labeler:
 	# classify single issue
 	def classify_issue(self,issue):
 		issue = [self.sanitize_text(issue)]
-		print issue
 		classification = self.classifier.predict(issue)
 		return self.binarizer.inverse_transform(classification)
 
@@ -121,5 +120,3 @@ class Labeler:
 		for json_obj in labels_json:
 			names.append(json_obj['name'])
 		return names
-
-g = Labeler()
