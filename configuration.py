@@ -9,6 +9,6 @@ config = {
 	"per_page": 100,
 	"tracked_keys": ["body", "title","number","labels","comments_url"],
     "ignored_labels": ["stale","attached PR","needs feedback","good first patch","needs backport","onhold","pinned","With reproduction steps"],
-    "data_filename":"rails_data_2.json",
+    "data_filename":"rails_data.json",
     "state":"all"
 }
