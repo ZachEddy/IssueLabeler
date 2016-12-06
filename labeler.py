@@ -111,7 +111,7 @@ class Labeler:
 
 	# load a json file from memory
 	def load_json(self,filename):
-		with open(filename) as json_file:
+		with open("json/" + filename) as json_file:
 			return json.load(json_file)
 
 	# get all the labels from the repository

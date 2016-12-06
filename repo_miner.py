@@ -10,7 +10,7 @@ class RepoMiner:
     # gathers all the issues for the repository
     def load_issues(self):
         filename = self.config['data_filename']
-        if os.path.isfile(filename):
+        if os.path.isfile("json/" + filename):
             print self.overwrite_warning(filename)
             yes = set(['yes','y', 'ye'])
             choice = raw_input().lower()
@@ -28,15 +28,15 @@ class RepoMiner:
 
     # write a json file to memory
     def write_json_file(self,filename,json_data):
-        with open(filename, 'w') as outfile:
+        with open("json/" + filename, 'w') as outfile:
     		json.dump(json_data, outfile, indent=1, sort_keys=True, separators=(',', ':'))
 
     # remove unused json to reduce size
     def shorten_issue(self,issue):
-    	shortened = {}
-    	for key in self.config["tracked_keys"]:
-    		shortened[key] = issue[key]
-    	return shortened
+        shortened = {}
+        for key in self.config['tracked_keys']:
+            shortened[key] = issue[key]
+        return shortened
 
     # get issues from the github repository via http
     def fetch_issues(self):
