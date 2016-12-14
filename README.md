@@ -1,5 +1,5 @@
 ## Overview
-This project attempts to automatically label issues and pull requests on GitHub repositories. It accomplishes this task by identifying patterns between issue descriptions and their corresponding labels. With enough user-generated examples for training, it will create meaningful labels on its own. Less time spent labeling = more time for pizza.
+This project attempts to automatically label issues and pull requests on GitHub repositories. It does so by identifying patterns between issue descriptions and their corresponding labels. With enough user-generated examples for training, it will create meaningful labels on its own. Less time spent labeling = more time for pizza 🍕.
 
 ## Example
 The Rails repository has thousands of labeled issues and pull requests. I collected all ~25,000 and stored them in `rails_data.json` to use for training. About two-thirds unfortunately don't have labels, which makes them useless for supervised learning. Regardless, the following will demonstrate the purpose of this project.
@@ -17,7 +17,7 @@ It might help to quickly glance at the [list of labels](https://github.com/rails
 
 After training on a few thousand examples, the classifier determines `issue` should have two labels: `activerecord` and `docs`. This makes sense considering the language of the issue. First, mentioning 'documentation' would suggest it relates to, well, documentation. Second, ModelSchema is a part of ActiveRecord, so it seems logical to label it `activerecord`.
 
-I also tested this classifier with 30 labeled issues from the Rails repository. It needs work, but [**the preliminary results are very exciting**](http://chopapp.com/#5a3xiqo0). Seriously, check it out!
+I also tested this classifier with 30 labeled issues from the Rails repository. It needs work, but [**the preliminary results are very exciting**](http://chopapp.com/#5a3xiqo0). Seriously, check it out! (the page takes a few seconds to load)
 
 ## Installing
 You will need **scikit-learn**, a machine learning package for Python. Click [here](http://scikit-learn.org/stable/install.html) to see their step-by-step installation page.
@@ -47,5 +47,5 @@ Progress: sending request 4
 
 Issues get stored inside the json folder as `.json` files. After the collection process completes, you can follow the example to start classifying on your own.
 
-## Final Notes
+## Concluding Remarks
 If I make the classifier generate labels accurately, I will turn this into a GitHub application that auto-labels new issues via POST requests. At the moment, however, I am working to improving classification.
