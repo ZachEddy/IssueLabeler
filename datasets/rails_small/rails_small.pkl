@@ -1,0 +1,1118 @@
+(dp0
+S'body'
+p1
+(lp2
+V### Summary\u000a\u000aIn #27126, @kamipo updated the regex matcher for `unsigned?` to exclude enum and set types. There was a discussion on why the change was necessary, and I thought it might be worthwhile to include the reasoning in with the code for future readers.
+p3
+aV### Summary\u000a\u000aDoc code sample generates syntax error, needs parenthesis around .find_by_identity parameter.\u000a\u000aSeemed clearer to remove local variable (named after method/attribute, bad) and if/else/end statement, then replace with '||' operator\u000a\u000aFYI, came across this working on a YARD based doc system, it uses Ripper for code highlighting, and I noticed this section wasn't highlighted...
+p4
+aV### Summary\u000a\u000aCurrently, we use `headers[:content_type]` but I think it should be from class default variable `self.class.default[:content_type]`. Because in `set_content_type`, we named the third variable as `class_default`
+p5
+aVWe'd like to be able to better present errors that occur when a record\u000apasses in-memory validation but fails to insert or update to the\u000adatabase due to a null constraint on a column. Introduce\u000aActiveRecord::NotNull as a wrapper around these database errors, and\u000arescue this error type when the Postgres adapter raises a\u000aPG::NotNullViolation, is asked to translate to a handleable error, and\u000areturns a AR::NotNull. Since we'll need to know what column caused the\u000aissue to correctly display the error, we have the connection adapter\u000aparse the PG::NotNullViolation message to extract the column. The\u000aAR::NotNull is then rescued, a :blank error is added to the appropriate\u000acolumn on the model, and an ActiveRecord::RecordInvalid is raised.\u000a\u000aIn applications developers generally see PG::NotNullViolations in their\u000alogs or bug trackers when they've set a null constraint on a column but\u000ahave not defined a corresponding presence validation on the model. This\u000aoften manifests as a 500 response to application users when they've not\u000apopulated a specific column, but isn't presented in a good way as it\u000awould be if the validation were present.\u000a\u000aWrap the PG::NotNullViolation in an ActiveRecord error with knowledge of\u000athe column which caused the error.\u000a\u000aAR::NotNull provides the standard interface that connection adapters can\u000ause to inform us of not null constraint violations. This allows us to\u000arescue them in order to provide a familiar and useful interface to\u000ainvalid records: the ActiveRecord::RecordInvalid error combined with\u000apopulating `errors[column]` with a "blank" error as if the model had\u000adefined the presence validation implied by the null constraint.\u000a\u000aRescue ActiveRecord::NotNull, populate errors[column] with an\u000aappropriate `:blank` message, and raise RecordInvalid.\u000a\u000aThis process allows us to take an unfriendly error for developers, which\u000alikely results in a 500 response for end-users, and present it in a\u000afamiliar, actionable way that will probably already be handled by\u000aredirects to a form with styles and messaging to assist in resolving the\u000aproblem.\u000a\u000a       +-----------------------------+\u000a       | ActiveRecord::RecordInvalid |\u000a       |  errors.add(column, :blank) |\u000a       +--------------^--------------+\u000a                      |\u000a    +-----------------------------------+\u000a    | ActiveRecord::NotNull.new(column) |\u000a    +-----------------^-----------------+\u000a                      |\u000a           +----------+-----------+\u000a           | PG::NotNullViolation |\u000a           +----------------------+\u000a\u000aThis PR is a proof-of-concept for adapting these error messages into\u000aactionable AR::RecordInvalids with useful errors populated for columns.\u000aOther potential applications of adapting messaging from the database to\u000auseful ActiveModel/ActiveRecord::Errors include:\u000a\u000a* Errors for missing associations from foreign key constraints\u000a* Errors for comparisons and numericality from CHECK constraints\u000a* Clusivity errors\u000a* Length errors\u000a* Uniqueness errors from index violations\u000a* etc.
+p6
+aV### Summary\u000a\u000aClarifying some of the language/punctuation and removing a couple [comma splices](https://en.wikipedia.org/wiki/Comma_splice).
+p7
+aVActually the `primary_key` definition is not used but the inconsistency\u000ais confusing. Actual definition is `bigint auto_increment PRIMARY KEY`\u000aso `UNSIGNED` and `(8)` is unnecessary.\u000a\u000aSee also #21607.
+p8
+aVBecause defunct wrapper class is kept for compatibility.
+p9
+aVFollow up to #27272.\u000a\u000ar? @matthewd
+p10
+aV### Steps to reproduce\u000a\u000aAdd lines to `ApplicationController`:\u000a\u000a\u000aRefresh page few times. See the number is increasing.\u000a\u000aIt's related to #20384. Digests are cleared, but not cache objects. I haven't found easy way to clear all caches, as every controller seems to have its own.\u000a\u000a### Expected behavior\u000a\u000aCache size should not be incremented infinitely.\u000a\u000a### Actual behavior\u000a\u000aIt's incremented infinitely.\u000a\u000a### System configuration\u000a**Rails version**: 5.0.0.1\u000a\u000a**Ruby version**: 2.3
+p11
+aVUsing `:auto_increment` option for abstracting the DB-specific auto\u000aincremental types. It is worth to ease to implement the compatibility\u000alayer.\u000a\u000aI think that this will help to implement #26266.
+p12
+aV__TL/DR__ `rspec spec/integration`. Before: 35sec. After patch: 20sec. \u000a\u000a#20384 implemented template digest expiry for dev requests. It's enabled by default for test env, which is not required and degradates test performance.\u000a\u000aI'm not sure if there should be testcase for this commit.\u000a\u000a__UPD__ There is failing test on travis. But it's for actioncable, and passes locally for me.
+p13
+aV### Summary\u000a\u000aAdjusted API Documentation of `link_to` method in `url_helper.rb` to talk about link instead of button in `disable_with` section. Also removed reference to form in this section as a form is not necessarily involved.
+p14
+aVSeeing as yarn already uses `sh` for their binstub (https://github.com/yarnpkg/yarn/blob/master/bin/yarn), we opt to use `sh` as well. The main reason for this being that boot times for some interpreters (i.e. jruby) are rather slow. This makes for a much better UX for these users.\u000a\u000aSee: https://github.com/rails/rails/pull/27245
+p15
+aV### Steps to reproduce\u000a\u000aI can not use `5.1.0.alpha` to start a rails server with options.\u000a\u000a### Expected behavior\u000awork well.\u000a\u000a### Actual behavior\u000a\u000a<img width="1204" alt="2016-12-03 11 11 00" src="https://cloud.githubusercontent.com/assets/5362640/20860244/51e89972-b9ae-11e6-887e-ac57f22c26e8.png">\u000a\u000a\u000a### System configuration\u000a**Rails version**: 5.1.0.alpha\u000a\u000a**Ruby version**: 2.3.3
+p16
+aVI fixed it according to other test case.\u000a\u000aref. https://ruby-doc.org/core-2.3.3/Enumerable.html#method-i-sort_by
+p17
+aVIts standard name is JavaScript, so I think that JavaScripts were better.\u000a\u000aThe following is an example.\u000a\u000a## Before
+p18
+aVI have the below 2 models:\u000a\u000a\u000a\u000a### Expected behavior\u000a \u000a`.unscoped` should work with `.includes` while using `.order()`.\u000a\u000a### Actual behavior\u000a\u000aIn 1 case it is working, but in another case it is not working. Look the error above.\u000a\u000a### System configuration\u000a**Rails version**: Rails 5.0.0\u000a**Ruby version**: ruby 2.3.1p112 (2016-04-26 revision 54768) [x86_64-darwin15]
+p19
+aV### Summary\u000a\u000a\u000asince I've upgraded to rails 5, all deprecations are shown to be coming from inside the framework.\u000a\u000a\u000a### Other Information\u000a\u000aBefore:
+p20
+aVThis pull request fixes has many scope in autosave after_save callbacks.\u000aThis problem is also present in 4.2.x.
+p21
+aVFollow up to 3dac36bd8e26363bb10f4d2a7b21efa75d200e26
+p22
+aVfix bug in method `limited_ids_for`, presented with group by.\u000aI hope test is obvious. If not, please let me know, I will try to explain.\u000aNot sure this is the best solution. MIN() is not exactly what we want, but in general case it should work.
+p23
+aV### Summary\u000a\u000aIn SQL a `DELETE` statement is always idempotent (will always succeed even if the underlying table is only modified once). Consequently the `after_commit` callbacks on `:destroy`will be invoked multiple times for a given model, even if a single deletion occurred. This means that user handlers must also be idempotent, which is not always the case (for example, if counting resources).\u000a\u000aThe issue addressed in this PR is related to https://github.com/rails/rails/pull/14735 and is fixed in a similar fashion:\u000a\u000a- Introduce an optional `:idempotent` flag for the `after_commit` callback.\u000a- Default to `true` to preserve existing behaviour.\u000a- Cache whether the operation affected any rows and provide an `actually_destroyed?` getter.\u000a- Demonstrate problem and solution with new unit tests.\u000a\u000aWe (Shopify) have been running a monkey patched version of this PR since October in production with no ill-effects.\u000a\u000ar: @byroot @sgrif\u000acc: @tenderlove\u000a\u000aP.S. This is my first Rails PR, so if there are any silly issues or violated conventions please let me know and I will resolve them as soon as possible. Thank you!
+p24
+aVCreating a new Rails 5 application with a model that has a PostgreSQL money typed field will fail to save records if said field is set as a Ruby Float. Note:\u000a\u000a1. Setting the money field as an `Fixnum` (e.g. `12`), `String` (e.g. `"12.25"`), or `String` with a dollar sign (e.g. `"$12.25"`) works as expected. No error is thrown, and the field when read back from PostgreSQL is properly typed in Rails as a `BigDecimal`.\u000a2. Setting the money field as a `Float` (e.g. `12.25`), fails in Rails 5.0.0.1 (see below for example output and test file), and passes in Rails 4.2.7.1\u000a\u000a### Steps to reproduce\u000a\u000aTest file here: https://gist.github.com/wiegand/b481bdb9e6dc992048c127baf60cf0b5\u000a\u000a(**Note**: you will need to update the PostgreSQL connection string on line 22 with an appropriate value for your system.)\u000a\u000a### Expected behavior\u000aSetting and persisting a money-typed field as a float should properly convert and store the value as the appropriate money value in PostgreSQL.\u000a\u000a### Actual behavior\u000aThe following error is thrown:\u000a\u000a\u000a\u000a### System configuration\u000a**Rails version**: 5.0.0.1\u000a\u000a**Ruby version**: ruby 2.3.2p217 (2016-11-15 revision 56796) [x86_64-darwin16]\u000a\u000a**PostgreSQL version**: 9.6.1
+p25
+aV### Summary\u000a\u000aAdds support for config.action_cable.channel_prefix for #27224\u000a\u000aTODO:\u000a\u000a- [ ] Tests (Suite passes, but need to test this change).\u000a- [ ] Default to app_name:env in new_framework_defaults?\u000a- [ ] Documentation\u000a- [ ] ??? I'm sure there's more...
+p26
+aVWith rails 5.0.1.rc1, I'm seeing failures to create indexes in MySQL with `length` options specified.  It looks like the `length` options are being ignored.\u000a\u000a### Steps to reproduce\u000a\u000a- Executable reproduction script: https://gist.github.com/seanwalbran/03939f95c9dd2ba2c02fadc99698fe52#file-active_record_gem-rb\u000a- Log of failure under 5.0.1.rc1: https://gist.github.com/seanwalbran/03939f95c9dd2ba2c02fadc99698fe52#file-5-0-1-rc1-log\u000a- Log of success under 5.0.0.1: https://gist.github.com/seanwalbran/03939f95c9dd2ba2c02fadc99698fe52#file-5-0-0-1-log\u000a\u000a[Line that breaks](https://gist.github.com/seanwalbran/03939f95c9dd2ba2c02fadc99698fe52#file-active_record_gem-rb-L30): \u000a\u000a### Expected behavior\u000a\u000aIndex `length` options should be applied when the index is created\u000a\u000a### Actual behavior\u000a\u000aIndex `length` options are ignored, resulting in the failure to create the index if underlying length limits are exceeded.  Note in particular that the create table USING clause differs as follows:\u000a- 5.0.1.rc1 (failure): USING btree (`user_id`, `uri`))\u000a- 5.0.0.1 (success): USING btree (`user_id`, `uri`(255)))\u000a\u000a### System configuration\u000a**Rails version**: 5.0.1.rc1\u000a\u000a**Ruby version**: 2.3.1\u000a\u000a**Database**: mysql 5.6.22
+p27
+aV### Summary\u000a\u000aWhen using a version of SQLite3 that does not support multi-insert statements, we build a string containing multiple statements. This string is then passed to `SQLite3::Database.execute()` but `.execute()` will only execute the first statement in a string and return any necessary results.\u000a\u000aThis change introduces a new method which uses `SQLite3::Database.execute_batch()` to execute all of the statements in the string. The caveat with `SQLite3::Database.execute_batch()` is that it cannot return a result set and instead returns nil. See http://www.rubydoc.info/gems/sqlite3/1.3.12/SQLite3%2FDatabase%3Aexecute_batch.\u000a\u000aThis new method is used to insert multiple versions into the `schema_migrations` table when migrations have been executed successfully, but only when normal multi-insert statements aren't supported by the SQLite3 version installed on the system.\u000a\u000aFixes #26948.\u000a\u000a### Other Information\u000aN/A
+p28
+aV### Summary\u000a\u000a[Problematic file](https://github.com/rails/rails/blob/00797f14a4882942560c8a0945ab5c2f085c4625/activerecord/CHANGELOG.md).\u000a\u000aI took a quick look at open issues/pull requests but no fix in sight.\u000a\u000a### Other Information\u000a\u000aThe alternative is escaping it but moving around the text seems a bit simpler.
+p29
+aV### Summary\u000a\u000aAdds the exception backtrace to the TaggedLogging formatter, similar to what the base formatter class does. In addition, when a non `String` or `Exception` is handled, the formatter now outputs `msg.inspect`.
+p30
+aV### Steps to reproduce\u000a\u000aStarting from Ruby 2.3.0, `Object.each_space` also [returns singleton classes](https://bugs.ruby-lang.org/issues/11360).\u000a\u000aThat breaks behavior of `Class.descendants` and `Class.subclasses` that also start to return singleton classes of their arguments.\u000a\u000a\u000a\u000a### System configuration\u000a**Rails version**: 5.0.0\u000a\u000a**Ruby version**: 2.3.3\u000a\u000a**OS**: macOS Sierra 10.12.1
+p31
+aV### Steps to reproduce\u000aUsing PostgreSQL, create a table with a jsonb field, and a corresponding ActiveRecord model, for this example the field will be called `foo` and the model `Bar`.\u000a\u000aThen using the rails console:\u000a\u000a\u000a### Expected behavior\u000a`b.foo` returns `"test string"`\u000a\u000a### Actual behavior\u000a`b.foo` returns `nil`\u000a\u000a### System configuration\u000a**Rails version**: 4.2.6\u000a\u000a**Ruby version**: 2.2.5\u000a\u000a### Additional notes\u000a\u000aI believe this is happening because of this line, which only encodes Hashes and Arrays: https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/connection_adapters/postgresql/oid/json.rb#L21\u000a\u000aIt also seems this behavior was changed in Rails 5, and is likely no longer an issue there:\u000ahttps://github.com/rails/rails/blob/5-0-1/activerecord/lib/active_record/type/internal/abstract_json.rb
+p32
+aVBackport #26972 and #26981.\u000a\u000aOur Rails app encountered lots of slow queries due to except `:order`.\u000aCurrently I'm using `relation.load.size` instead as a workaround to keep `:order`.\u000a\u000aI'd like to backport these fixes to latest stable branch.
+p33
+aVRemove outdated tip regarding second argument of `options_for_select` from form_helpers guid.
+p34
+aVHi,\u000a\u000aThis is a tiny pull request that addresses the ticket in Basecamp regarding simplifying linking to GitHub or the API site in GitHub.\u000a\u000aUsing `grep` inside the guide folder, it looks like:\u000a\u000a* Most GitHub links are either for release notes or to refer to the code file inside the "Active Support Core Extensions" guide.\u000a* The `api://` scheme can definitely improve the guides. At the moment, links are barely going to the current version's site so they may become broken in the future or a feature may be documented while it's only available in newer versions.\u000a\u000aSo this pull request addresses the following things:\u000a\u000a* It is possible to link to a file hosted on GitHub like this for instance:\u000a  * `github://5-1-stable/activesupport/CHANGELOG.md` will become "https://github.com/rails/rails/tree/5-1-stable/activesupport/CHANGELOG.md".\u000a  * `github://github://abstract_controller/caching.rb` will become "https://github.com/rails/rails/tree/master/actionpack/lib/abstract_controller/caching.rb" (and the `master` part is automatically changed if the `RAILS_VERSION` environment variable is defined).\u000a* Every note that have "Defined in `path/to/file.rb`" are now automatically expanded with a link.\u000a* It is possible to link to the API site like this for instance:\u000a  * For instance methods, `api://ActionDispatch::Http::Cache::Request#etag_matches?` will become "http://edgeapi.rubyonrails.org/classes/ActionDispatch/Http/Cache/Request.html#method-i-etag_matches-3F" (`?` and `!` are properly URI-encoded for anchors and the `edgeapi` part changes to `api` with the proper version in the URL if the `RAILS_VERSION` environment variable is defined).\u000a  * For class methods, `api://ActionController::Renderer.new` will become "http://edgeapi.rubyonrails.org/classes/ActionController/Renderer.html#method-c-new".\u000a\u000aThere's already an opened pull request to address the automatic linking of notes inside the core extensions guide. The author has been properly credited inside the commit but here's the PR for reference: https://github.com/rails/rails/pull/20036.\u000a\u000aLet met know if there's anything that isn't addressed or wrong here!\u000a\u000aHave a nice day ! :-)
+p35
+aVThough I understand, and agree with, the rationale behind the removal of the dynamic `:action` segment in https://github.com/rails/rails/pull/23980, the suggested workaround to whitelist each individual action is leading to application memory bloat.\u000a\u000aWith a simple rails runner:\u000a\u000a|         | Memory         | Time         | `rails routes` entries |\u000a|---------|----------------|--------------|---------------|\u000a| Before   | 166_028_629 MB | 6.142s       | 656           |\u000a| After  | 187_430_229 MB | 6.838s       | 3798          |\u000a| Change | ~21 MB (+12.9%) | 0.7s (+11.3%) | 3142 (+479.0%)  |\u000a\u000aIf you want to see the workaround source, you can see it at https://github.com/ManageIQ/manageiq/pull/12895/commits/0f6fee967d71b5f41cfad011d6ada4b058b9517b  (In all fairness, the diff is backwards to the numbers above...we originally had one-route-per-whitelist-entry and are trying to move *towards* the dynamic `:action` with a Regexp whitelist in order to decrease our process memory.  It wasn't until I wrote the change to use the dynamic `:action` that I ran into this deprecation.)\u000a\u000a---\u000a\u000a### Memory analysis\u000a\u000aUsing the allocation tracer from [this gist](https://gist.github.com/jrafanie/9e1d3caeb29339f696b8b6f4eca9efda) (Thanks @jrafanie!), you can see that the majority of our boot time retained allocations are in action_dispatch/routing and action_dispatch/journey with a bonus ~53k strings from somewhere else (NOTE: These are the top 10 entries, but note that there are many more journey and routing lines after these)\u000a\u000aBefore (dynamic `:action`)\u000a\u000a\u000a\u000a---\u000a\u000aI think there are three ways forward with this, so I was hoping to discuss that here.\u000a\u000a1. Instead of deprecating the `:action` segment entirely, only deprecate it if there isn't a qualifier (in our case, we have a Regex whitelist).  If a Regex isn't acceptable, perhaps create a specific "whitelist" constraint on the `:action` segment, and don't allow dynamic `:actions` without the whitelist constraint.\u000a2. Figure out how we can reduce the memory overhead of the routing.  Additionally, we pay the penalty of setting up the routes even when we don't need them in console or runner, so perhaps we can dynamically resolve them when needed?\u000a3. Just accept that my process will be ~10% heavier (please don't pick this one :smile: )\u000a\u000acc @pixeltrix @tenderlove @matthewd
+p36
+aV### Steps to reproduce\u000a\u000arails g   #Pretty much any rails g commands show this error\u000a\u000a### Expected behavior\u000aI expect no error\u000a\u000a### Actual behavior\u000athe following message appears ==> Expected string default value for '--jbuilder'; got true (boolean)\u000a\u000aOtherwise everything seems to function properly\u000a\u000a### System configuration\u000a**Rails version**: 4.2.7.1 (and others)\u000a\u000a**Ruby version**: 2.2.5 (and others)
+p37
+aVFollow up to f39779fb8e40bf88ea842116e4bddcd7280a9a94.\u000a\u000aCI failure is due to missing `Regexp#match?` in 5-0-stable.
+p38
+aV### Summary\u000a\u000aAllow to custom `content-type` in case of setting `headers[:body]` and `attachments`
+p39
+aV### Steps to reproduce\u000a\u000a1. create two rails app with a basic chat\u000a2. Setup ChatChannel for both app with `stream_from "chat_channel"`\u000a3. Run both app and two differents actioncable server (using redis)\u000a4. send a message from app 1\u000a\u000a### Expected behavior\u000a\u000aThe message is saved in app 1 and broadcasted to **app 1** websocket\u000a\u000a### Actual behavior\u000a\u000aThe message is saved in app 1 and broadcasted to **both app** websocket
+p40
+aV### Steps to reproduce\u000a\u000aarticles = []\u000aarticle_ids.each do |article_id|\u000a  articles << Article.find_by!(id: article_id)\u000aend\u000a\u000a### Expected behavior\u000aarticles = Article.find_batch_by!(id: article_ids)\u000a\u000a### Actual behavior\u000aThere's no such method.\u000a\u000a### System configuration\u000a**Rails version**:\u000a5.x\u000a**Ruby version**:\u000a2.3.x
+p41
+aVhi guys\u000a\u000aHow search in hash column ?\u000a\u000a\u000a## search query\u000aProduct.where('properties[foo] = bar')
+p42
+aV### Summary\u000a\u000aWas trying to answer a question on stackoverflow and looking into the logic of how folders end up in the `autoloadpath`. Trying to understand the logic it looked to me that `@current` is used nowhere in `Root` itself and most likely a reminiscent from a refactoring.\u000a\u000aUnit-Tests are still \U0001f34f
+p43
+aV### Summary\u000a\u000aThis just fixes a typo in `railties/CHANGELOG`:
+p44
+aVI found a test expression that not compatible with rubocop and I decided fixe it. This PR doens't fix a bug and doesn't change the documentation.\u000a\u000a=)\u000a\u000aThanks!
+p45
+aV### Steps to reproduce\u000a\u000aI have created an executable test for this bug: https://gist.github.com/ianks/ba1f7175754780168c2a6618f13c95ec\u000a\u000aI did not know whether to report this to Psych or Rails, just let me know if it belongs elsewhere and I will move the issue.\u000a\u000a### Expected behavior\u000aPsych.to_json should emit valid JSON. Currently, not all keys are double-quoted; which although valid in JS, is not valid JSON.\u000a\u000a### Actual behavior\u000aIt emits invalid json, which can be seen in this example:\u000a\u000a\u000a### System configuration\u000a**Rails version**: 5.0.0\u000a\u000a**Ruby version**: 2.3.1
+p46
+aV[ci skip]
+p47
+aV### Summary\u000a\u000aMethod simply needs to return a `PG::Connection` object. Will by default\u000ause Active Record, but can be overridden to support other ORMs.
+p48
+aV### Steps to reproduce\u000a\u000aPUT/PATCH parameters that look like `{ id: "1", stuff: {"A" => [], "B" => [], "C" => [], "D" => []} }` will completely drop the `stuff` parameter by the time we're in the controller method.\u000a\u000a### Notes\u000aI've got a sample app [here](https://github.com/lukebooth/empty-array-params) with `rails-4.2` and `rails-5` branches where the tests pass and don't pass, respectively. I'm trying to figure out the differences between the rails versions that cause the empty object to be dropped.\u000a\u000aI've seen some articles and issues with parameter [deep munging](https://github.com/rails/rails/pull/16924) does that have something to do with it? If this isn't the place to bring up this issue, please close this. Thanks!\u000a\u000a### System configuration\u000a**Rails version**:\u000atests pass in 4.2 and fail in 5.0.0.1\u000a\u000a**Ruby version**:\u000a2.2.4
+p49
+aV### Steps to reproduce\u000a\u000a1. Create a Rails app using Sequel and sequel-rails, without ActiveRecord\u000a2. Attempt to use the ActionCable Postgres adapter\u000a3. Watch it crash trying to autoload ActiveRecord\u000a\u000a### Expected behavior\u000a\u000aIdeally, this would support the most popular Postgres ORMs out of the box. Or at least the docs should mention that this only works with AR.\u000a\u000a### Actual behavior\u000a\u000aException trying to autoload ActiveRecord\u000a\u000a### System configuration\u000a**Rails version**: 5.0.0.1\u000a\u000a**Ruby version**: 2.3.3\u000a\u000aIt was very easy to fork the Postgres ActionCable subscription adapter to work with Sequel. I only had to alter the `with_connection` method, which is even shorter with Sequel: https://gist.github.com/bgentry/5a4592dbbcc398c0ad651c53af7da51f#file-postgresql_sequel-rb-L35-L40\u000a\u000aI'm not sure whether the right approach is to try to support this out-of-the-box, or at least to document that the adapter is AR-specific. Thoughts?\u000a\u000aAs a user I'd certainly prefer not to have to maintain a fork of the subscription adapter. But I can certainly see the argument for this not being Rails' problem. I suppose I really only need to monkey-patch or refine that one method, though, so not too bad either way.
+p50
+aV### Steps to reproduce\u000a\u000a\u000a\u000a### Expected behavior\u000adefault_scope is unscoped.\u000a\u000a### Actual behavior\u000adefault_scope isn't unscoped.\u000aSame for eager_load.\u000a\u000a### System configuration\u000aRails 5.0.0.1\u000aRuby 2.3.1p112 (2016-04-26 revision 54768) [x86_64-darwin15]
+p51
+aV### Summary\u000a\u000aThese changes:\u000a\u000a- Explicitly document `false` as one of the possible values for the `action_on_unpermitted_parameters` option. It was confusing to see it mentioned as default value without previously including it among the possible options.\u000a- Add a missing Oxford comma, honoring the API Documentation Guidelines.\u000a\u000aNote: While I've used 'filter them out' as explanation for the behavior, I'm not sure it's the best wording. Feel free to directly improve it if needed ;)
+p52
+aVIncluding `ActionView::Rendering` in a controller of an API-only application breaks `render :json`, resulting in an `ActionView::MissingTemplate` error.  This is similar to #25183, except that the error occurs **without** using jbuilder.\u000a\u000a### Steps to reproduce\u000a\u000a1. Use `rails new --api` to create a Rails app with jbuilder disabled by default.\u000a2. Include `ActionView::Rendering` in a controller subclassed from `ActionController::API`, then `render :json`:\u000a\u000a\u000a\u000a[Full example failing test](https://gist.github.com/jpettettphaxio/303edc3639c0b0820a2fff40bf3b70e3\u000a)\u000a\u000a### Expected behavior\u000aJSON response should be returned without error.  No template should be used.\u000a\u000a### Actual behavior\u000a`ActionView::MissingTemplate` is raised.\u000a\u000a### System configuration\u000a**Rails version**: 5.0.0.1 (used `rails new --api`)\u000a\u000a**Ruby version**: 2.3.1
+p53
+aV### Steps to reproduce\u000a\u000aCreate a model with tags column like in example above and save it. Then update the column tags with a word that contains 'russian' letters only(or partially) and save it. The result will be our object with tags in ASCII-8BIT encoding.\u000a\u000a### Expected behavior\u000aIt should be encoded correctly.\u000aFor example if we update with ['\u043f\u0440\u0438\u0432\u0435\u0442', 'tag1', 'tag2'] the same array is expected to be mapped back for model.\u000a\u000a### System configuration\u000arails 5.0.0.beta2\u000aruby ruby 2.3.0p0
+p54
+aV### Expected behavior\u000a(Time.at(1480377600) + 3.months - 3.months).to_i == 1480377600\u000a\u000a### Actual behavior\u000a(Time.at(1480377600) + 3.months - 3.months).to_i == 1480291200\u000aOff by one day, due to the 29th of February\u000a\u000a### System configuration\u000a**Rails version**:\u000a5.0.0.1\u000a\u000a**Ruby version**:\u000aruby 2.3.1p112 (2016-04-26) [x86_64-linux-gnu]
+p55
+aVThere were some places in the PostgreSQL adapter that didn't have documentation, so I added some.
+p56
+aVThe issue affects MRI 2.2.5, MRI 2.3.3, JRuby 9.1.6.0. It can be reproduced by:\u000a\u000a\u000a\u000aOriginally quotes were introduced in https://github.com/rails/rails/pull/19819 as a part of fixing `Testing::Isolation` MRI 2.2.2. That PR touches multiple lines and there're no background described about the quites. @gazay do you remember that by the chance?\u000a\u000aThe fix solves issue on all affected platforms: MRI 2.2.5, MRI 2.3.3, JRuby 9.1.6.0.\u000a\u000a@guilleiguaran @rafaelfranca
+p57
+aVHi!\u000aI've got stuck with unexpected behavior when creating ActiveRecord models located in subdirectories.\u000aConsider these models:\u000a\u000aI expect `table_name` for each profile would be `man/profile` and `company/profile` respectively, as `"Man::Profile".tableize` says, but it is actually `"user_profiles"`\u000a\u000aIf I use flat structure without nesting profiles in subfolders (man_profile.rb and company_profile.rb) everything is fine (`"man_profile"` and `"company_profile"` tables in this case).
+p58
+aVAddresses #22862\u000a\u000aAdded note about needing to add additional code to the setup block to get the tests to pass if you've implemented basic authorization.\u000a\u000a[ci skip]\u000a\u000acc @cllns
+p59
+aVHere:\u000a\u000ahttp://guides.rubyonrails.org/form_helpers.html\u000a\u000ait writes:\u000a\u000a`The second argument to options_for_select must be exactly equal to the desired internal value. In particular if the value is the integer 2 you cannot pass "2" to options_for_select - you must pass 2. Be aware of values extracted from the params hash as they are all strings.`\u000a\u000aHowever, I tried doing exactly this in Rails 5 and it worked. So you might want to remove this or specify it applies for older versions of Rails.
+p60
+aV### Steps to reproduce\u000a\u000a * Create an active record model using the postgresql adapter that has a column of type `json`\u000a * Load an instance of the model from the database where the value of the column is `NULL`\u000a * Save the instance\u000a\u000a### Expected behavior\u000aThe column should not be included in previous_changes, since it did not change\u000a\u000a### Actual behavior\u000a`previous_changes` will be `{"my_column" => [nil, nil]}`\u000a\u000a### System configuration\u000a**Rails version**:\u000aRails 5.0.0.1\u000a\u000a**Ruby version**:\u000aruby 2.3.0p0 (2015-12-25 revision 53290) [x86_64-darwin15]\u000a\u000a**Notes**:\u000a\u000aThis only happens in Rails 5.  In rails 4, previous_changes would have been empty, as expected.\u000a\u000aHere is a test that passes in rails 4 but fails in rails 5, assuming you have a `users` table with a `provider_user_info` column of type `json`
+p61
+aV### Steps to reproduce\u000a\u000a- Have some migrations\u000a- Run `rake db:migrate`\u000a- Coworker add more migrations\u000a- Coworker runs `rake db:migrate`\u000a- The difference between the two `schema.rb` is full of added spaces, different orders etc.\u000a\u000a### Expected behavior\u000a\u000aA consistent generation of `schema.rb`, shouldn't be machine-dependent.\u000a\u000a### Actual behavior\u000a\u000a- Adds / removes extensions, spaces, etc.\u000a- Different order (views first now, views last before, for instance).\u000a\u000a### Proposed solution\u000a\u000aHaving a `schema.rb` formatter would be nice a a post-processing step after its generation using a similar concept as `rubocop -a` for instance.\u000a\u000aI think It would be far more difficult to have an actual consistent generation as its derived from the database.\u000a\u000a### System configuration\u000a**Rails version**: 5.0.0\u000a\u000a**Ruby version**: 2.3.2\u000a\u000a**Postgres version**: 9.5.5
+p62
+aVRemove mention of outdated [blog post](http://weblog.jamisbuck.org/2007/2/5/nesting-resources) from routing docs, [next section](http://guides.rubyonrails.org/routing.html#shallow-nesting) already speaks about how to avoid deep nesting.\u000a\u000aThe paragraph was updated including:\u000a\u000a> TIP: Resources should never be nested more than 1 level deep.
+p63
+aV### Summary\u000a\u000aCurrenty, ActionController::Parameters dosen't have #reverse_merge and #reverse_merge!.\u000a\u000aBy using reverse_merge, you can write behaviors like default values.
+p64
+aV### Summary\u000a\u000aThe `Renderer#with_defaults` method was introduced in\u000ahttps://github.com/rails/rails/commit/2db7304c2c338711b265e92a51d29121cbd702e6\u000awith the intent of enabling a new renderer to be created with new\u000adefaults passed in. However, the method is broken as it references\u000a`env`, which is not available, thus throwing an error.\u000a\u000aWhile throwing the error can be fixed either by referencing the\u000a`@env` instance variable (or creating an `attr_reader` for it), the\u000amethod will still not perform as expected since `env` already has the\u000adefaults merged in (via the initializer). The only way for it to work\u000awould be to call `normalize_keys(env.merge(defaults))`, ie:\u000a\u000a\u000a\u000aIt feels like that would be a much more confusing API, though.\u000a\u000aThis PR opts to remove the method, without entering a deprecation cycle\u000asince it is already broken.
+p65
+aVI am running the following:\u000a\u000aruby -v\u000aruby 2.3.1p112 (2016-04-26 revision 54768) [x86_64-linux]\u000a\u000agems are:\u000a\u000aactiverecord (5.0.0.1)\u000asqlite3 (1.3.12)\u000a\u000aThe table create is:\u000a\u000aCREATE TABLE "member_statuses" ("member_statuses_key" INTEGER PRIMARY KEY   ,"members_key" integer  ,"board_member" text(1) DEFAULT 'N'  ,"membership_categories_key" integer  ,"membership_expiration" date  ,"paid_member" text(1) DEFAULT 'N'  ,"inactive" text(1) DEFAULT 'N'  );\u000a\u000aThe ruby program has:\u000a\u000a  class Member_status < ActiveRecord::Base\u000a    self.primary_key = 'member_statuses_key'\u000a    belongs_to :membership_category, :class_name => 'Membership_category',\u000a               :foreign_key=> 'membership_categories_key'\u000a  end\u000a\u000a  class Membership_category < ActiveRecord::Base\u000a    self.primary_key = 'membership_categories_key'\u000a    has_many :member_statuses, :class_name => 'Member_status'\u000a  end \u000a\u000aFrom withing the program Typing Member_status shows all columns.\u000a\u000aMember_status(member_statuses_key: integer, members_key: integer, board_member: text, membership_categories_key: integer, membership_expiration: date, paid_member: text, inactive: text)\u000a\u000aBut entering Member_status.column_names members_key is missing.\u000a\u000a["board_member", "membership_categories_key", "membership_expiration", "paid_member", "inactive"]\u000a\u000aSo if I run the following:\u000a\u000a      r = Member_statuses.create(fields)\u000a      ret2 = r.save\u000a\u000awhere fields = {"board_member"=>"N", "membership_categories_key"=>8, "membership_expiration"=>"2015-12-31", "paid_member"=>"N", "inactive"=>"N", "members_key"=>393}\u000a\u000aThe table has members_key as null\u000a\u000aIf I run the command from sqlite3\u000a\u000a INSERT INTO MEMBER_STATUSES ( board_member, membership_categories_key, membership_expiration, paid_member, inactive, members_key) VALUES ( 'N', 8, '2015-12-31', 'N', 'N', 392 );\u000a\u000aThis can be seen from a sqlite3 select.\u000a\u000aselect * from member_statuses where member_statuses_key>391;\u000a\u000a392|392|N|8|2015-12-31|N|N\u000a393||N|8|2015-12-31|N|N\u000a\u000aThis did work with older gems. I do not know the versions that worked.
+p66
+aVfixes #27192
+p67
+aV### Steps to reproduce\u000a\u000aGiven a case when `Pet.has_many :toys`, the following delete_all and update_all fails:\u000a\u000a\u000a\u000aBecause current Arel implementation ignores left joins when checking if it should join tables.\u000a\u000a### Expected behavior\u000aThe relation should be update/deleted\u000a\u000a### Actual behavior\u000aThe generated query is invalid\u000a\u000a### System configuration\u000a**Rails version**: 5\u000a**Ruby version**: any
+p68
+aVExtracted from #23211.\u000a\u000aExample:
+p69
+aV### Summary\u000a\u000aProvide a general description of the code changes in your pull\u000arequest... were there any bugs you had fixed? If so, mention them. If\u000athese bugs have open GitHub issues, be sure to tag them here as well,\u000ato keep the conversation linked together.\u000a\u000a### Other Information\u000a\u000aIf there's anything else that's important and relevant to your pull\u000arequest, mention that information here. This could include\u000abenchmarks, or other information.\u000a\u000aIf you are updating any of the CHANGELOG files or are asked to update the\u000aCHANGELOG files by reviewers, please add the CHANGELOG entry at the top of the file.\u000a\u000aFinally, if your pull request affects documentation or any non-code\u000achanges, guidelines for those changes are [available\u000ahere](http://guides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation)\u000a\u000aThanks for contributing to Rails!
+p70
+aV### Steps to reproduce\u000aAs in the start of the guide, change the article_edit view's form to like \u000a\u000a\u000a### Actual behavior\u000aIt should show the edit form again with error message that the title length should have length 5 or more\u000a\u000a### System configuration\u000a**Rails version**:\u000a4.2.5.1\u000a**Ruby version**:\u000a2.2.0
+p71
+aV### test, don't connect to mysql when running sqlite3 tests.\u000a\u000aResolves the following:\u000a\u000a\u000a\u000aPorts 4b1f67a11a6fd5680a7ce37b695a4d86e6a2c302
+p72
+aVPostgreSQL cares about valid UUID, and `a0eebc99-9c0b-4ef8-fb6d-6bb9bd380a11`\u000ais valid UUID. There's other versions other than the more popular\u000aversion 4, and so PostgreSQL's `uuid` type doesn't enforce a specific\u000aversion. It will accept any string that passes the general UUID validity\u000acheck.
+p73
+asS'title'
+p74
+(lp75
+V[ci skip] Document regex change
+p76
+aVActionCable::Connection::Base doc code sample syntax error
+p77
+aVWrong variable name in action mailer
+p78
+aVTranslate PG::NotNullViolation \u2192 AR::RecordInvalid
+p79
+aVUpdate puma.rb
+p80
+aVShould be sync the `primary_key` definition with actually created
+p81
+aVShould inherit `StatementInvalid` rather than `WrappedDatabaseException`
+p82
+aVMake `:auto_increment` option works on `:bigint`
+p83
+aVMemory leak in development
+p84
+aVMake `:auto_increment` to internal primary key option
+p85
+aVDon't clear digest cache in test environment
+p86
+aV[ci skip] Remove button reference in `link_to` api doc
+p87
+aVUse sh instead of Ruby script for yarn binstub
+p88
+aVRails 5.1.0.alpha can not start server with options
+p89
+aVUse #sort_by instead of #sort
+p90
+aVUse JavaScripts instead of Javascripts in `rake stats`
+p91
+aVincludes and unscoped not working while having default scope in both models
+p92
+aVfix deprecation_caller_message to display right file:line
+p93
+aVFix association scope inside autosaved association callbacks
+p94
+aVuse yarn binstub in `bin/update`
+p95
+aVLimited ids for with group by
+p96
+aVIdempotent option for after_commit :destroy callback
+p97
+aVSaving an ActiveRecord model with a PostgreSQL money field set with a Ruby Float throws a PostgreSQL syntax error in Rails 5
+p98
+aVWIP: Support channel_prefix configuration for ActionCable.
+p99
+aVdatabase index creation with length options failing in 5.0.1.rc1
+p100
+aVIntroduce `...SQLite3Adapter.execute_batch()` method
+p101
+aVPrevent issue number in documentation from becoming markdown header [ci skip]
+p102
+aVLogs exception backtrace in `ActiveSupport::TaggedLogging`
+p103
+aVClass.descendants returns singleton classes starting from Ruby 2.3.0
+p104
+aVActiveRecord coerces String values to nil for jsonb fields
+p105
+aV5-0-stable: Avoid `unscope(:order)` when `limit_value` is presented for `count`and `exists?`
+p106
+aVFixes #27202, [ci skip]
+p107
+aVSimplify linking to GitHub or the API site in the guides
+p108
+aVDynamic :action segment deprecation forces application bloat after suggested workaround
+p109
+aVExpected string default value for '--jbuilder'; got true (boolean)
+p110
+aVFix CI failure due to missing `Regexp#match?`
+p111
+aVAllow to custom content type when setting mailer body
+p112
+aVScope channel if multiple actioncable server using redis
+p113
+aVFind by an array of values
+p114
+aVsearch in hash
+p115
+aVremoved `@current` as it is not used
+p116
+aVfix typo in changelog
+p117
+aVUpdated test expression to unless because is more expressive
+p118
+aVPsych.to_json produces invalid json for objects inherited from ActiveRecord::Base
+p119
+aVFix typo in Rails 5.0 release notes \u2013 \u201cwhen when\u201d
+p120
+aVAdd configuration hook for fetching Action Cable database connections
+p121
+aVParameters with object having empty arrays as values get dropped
+p122
+aVActionCable Postgres adapter is ActiveRecord-specific
+p123
+aVCan't unscope default_scope in join
+p124
+aVExplicitly document 'false' as value for 'action_on_unpermitted_parameters'
+p125
+aVIncluding ActionView::Rendering in API controller without jbuilder breaks render :json
+p126
+aVIncompatible character encodings: ASCII-8BIT and UTF-8 , after updating model.
+p127
+aVDatetime adding and subtract does not result in the same time
+p128
+aVAdding more documentation for PostgreSQL adapter [ci skip]
+p129
+aVFix arguments passing in testing isolation
+p130
+aVTrouble with table name in inherited models
+p131
+aVAdd note about step needed to get tests to pass if you implemented basic auth [ci skip]
+p132
+aVSecond arg for 'options for select' works in Rails 5
+p133
+aVRails 5: previous_changes includes [nil, nil] entry for postrgesql json column
+p134
+aVConsistent generation of schema.rb
+p135
+aVRemove reference to outdated blog post.
+p136
+aVadd ActionController::Parameters#reverse_merge
+p137
+aVRemove broken Renderer#with_defaults method
+p138
+aVactiverecord table missing column
+p139
+aVfixing update_all and delete_all when chained with left_joins
+p140
+aVupdate_all and delete_all doesn't work when chained with left_joins
+p141
+aVActionCable channels unit-testing
+p142
+aVI found this issue and wanted to give the fix.
+p143
+aVGetting Started Guide:
+p144
+aVtest, don't connect to mysql when running sqlite3 tests.
+p145
+aVRemove wrong comment about PostgreSQL and UUIDs
+p146
+asS'labels'
+p147
+(lp148
+c__builtin__
+set
+p149
+((lp150
+Vactiverecord
+p151
+aVMySQL
+p152
+atp153
+Rp154
+ag149
+((lp155
+Vdocs
+p156
+aVactioncable
+p157
+atp158
+Rp159
+ag149
+((lp160
+Vactionmailer
+p161
+atp162
+Rp163
+ag149
+((lp164
+Vactiverecord
+p165
+aVPostgreSQL
+p166
+atp167
+Rp168
+ag149
+((lp169
+Vrailties
+p170
+atp171
+Rp172
+ag149
+((lp173
+Vactiverecord
+p174
+aVMySQL
+p175
+atp176
+Rp177
+ag149
+((lp178
+Vactiverecord
+p179
+atp180
+Rp181
+ag149
+((lp182
+Vactiverecord
+p183
+atp184
+Rp185
+ag149
+((lp186
+Vactionview
+p187
+atp188
+Rp189
+ag149
+((lp190
+Vactiverecord
+p191
+atp192
+Rp193
+ag149
+((lp194
+Vactionview
+p195
+atp196
+Rp197
+ag149
+((lp198
+Vdocs
+p199
+aVactionview
+p200
+atp201
+Rp202
+ag149
+((lp203
+Vrailties
+p204
+atp205
+Rp206
+ag149
+((lp207
+Vrailties
+p208
+atp209
+Rp210
+ag149
+((lp211
+Vactiverecord
+p212
+atp213
+Rp214
+ag149
+((lp215
+Vrailties
+p216
+atp217
+Rp218
+ag149
+((lp219
+Vactiverecord
+p220
+atp221
+Rp222
+ag149
+((lp223
+Vactivesupport
+p224
+atp225
+Rp226
+ag149
+((lp227
+Vactiverecord
+p228
+atp229
+Rp230
+ag149
+((lp231
+Vrailties
+p232
+atp233
+Rp234
+ag149
+((lp235
+Vactiverecord
+p236
+atp237
+Rp238
+ag149
+((lp239
+Vactiverecord
+p240
+atp241
+Rp242
+ag149
+((lp243
+Vactiverecord
+p244
+aVPostgreSQL
+p245
+atp246
+Rp247
+ag149
+((lp248
+Vactioncable
+p249
+atp250
+Rp251
+ag149
+((lp252
+Vactiverecord
+p253
+aVregression
+p254
+aVMySQL
+p255
+atp256
+Rp257
+ag149
+((lp258
+Vactiverecord
+p259
+atp260
+Rp261
+ag149
+((lp262
+Vactiverecord
+p263
+aVdocs
+p264
+atp265
+Rp266
+ag149
+((lp267
+Vactivesupport
+p268
+atp269
+Rp270
+ag149
+((lp271
+Vactivesupport
+p272
+atp273
+Rp274
+ag149
+((lp275
+Vactiverecord
+p276
+aVPostgreSQL
+p277
+atp278
+Rp279
+ag149
+((lp280
+Vactiverecord
+p281
+atp282
+Rp283
+ag149
+((lp284
+Vdocs
+p285
+aVactionview
+p286
+atp287
+Rp288
+ag149
+((lp289
+Vdocs
+p290
+atp291
+Rp292
+ag149
+((lp293
+Vactionpack
+p294
+aVrouting
+p295
+atp296
+Rp297
+ag149
+((lp298
+Vthird party issue
+p299
+atp300
+Rp301
+ag149
+((lp302
+Vactiverecord
+p303
+atp304
+Rp305
+ag149
+((lp306
+Vactionmailer
+p307
+aVneeds work
+p308
+atp309
+Rp310
+ag149
+((lp311
+Vactioncable
+p312
+atp313
+Rp314
+ag149
+((lp315
+Vactiverecord
+p316
+atp317
+Rp318
+ag149
+((lp319
+Vactiverecord
+p320
+atp321
+Rp322
+ag149
+((lp323
+Vrailties
+p324
+atp325
+Rp326
+ag149
+((lp327
+Vdocs
+p328
+aVrailties
+p329
+atp330
+Rp331
+ag149
+((lp332
+Vactivemodel
+p333
+atp334
+Rp335
+ag149
+((lp336
+Vactiverecord
+p337
+atp338
+Rp339
+ag149
+((lp340
+Vdocs
+p341
+atp342
+Rp343
+ag149
+((lp344
+Vactioncable
+p345
+atp346
+Rp347
+ag149
+((lp348
+Vactionpack
+p349
+atp350
+Rp351
+ag149
+((lp352
+Vactioncable
+p353
+atp354
+Rp355
+ag149
+((lp356
+Vactiverecord
+p357
+atp358
+Rp359
+ag149
+((lp360
+Vdocs
+p361
+aVactionpack
+p362
+atp363
+Rp364
+ag149
+((lp365
+Vactionview
+p366
+aVactionpack
+p367
+atp368
+Rp369
+ag149
+((lp370
+Vactiverecord
+p371
+aVPostgreSQL
+p372
+atp373
+Rp374
+ag149
+((lp375
+Vactivesupport
+p376
+atp377
+Rp378
+ag149
+((lp379
+Vactiverecord
+p380
+aVPostgreSQL
+p381
+aVdocs
+p382
+atp383
+Rp384
+ag149
+((lp385
+Vactivesupport
+p386
+atp387
+Rp388
+ag149
+((lp389
+Vactiverecord
+p390
+atp391
+Rp392
+ag149
+((lp393
+Vdocs
+p394
+aVactionpack
+p395
+atp396
+Rp397
+ag149
+((lp398
+Vdocs
+p399
+aVactionview
+p400
+atp401
+Rp402
+ag149
+((lp403
+Vactiverecord
+p404
+aVPostgreSQL
+p405
+atp406
+Rp407
+ag149
+((lp408
+Vactiverecord
+p409
+atp410
+Rp411
+ag149
+((lp412
+Vdocs
+p413
+aVactionpack
+p414
+atp415
+Rp416
+ag149
+((lp417
+Vactionpack
+p418
+atp419
+Rp420
+ag149
+((lp421
+Vactionpack
+p422
+atp423
+Rp424
+ag149
+((lp425
+Vactiverecord
+p426
+atp427
+Rp428
+ag149
+((lp429
+Vactiverecord
+p430
+atp431
+Rp432
+ag149
+((lp433
+Vactiverecord
+p434
+atp435
+Rp436
+ag149
+((lp437
+Vactioncable
+p438
+atp439
+Rp440
+ag149
+((lp441
+Vdocs
+p442
+atp443
+Rp444
+ag149
+((lp445
+Vdocs
+p446
+atp447
+Rp448
+ag149
+((lp449
+Vactiverecord
+p450
+atp451
+Rp452
+ag149
+((lp453
+Vactiverecord
+p454
+aVdocs
+p455
+atp456
+Rp457
+asS'comments_url'
+p458
+(lp459
+Vhttps://api.github.com/repos/rails/rails/issues/27286/comments
+p460
+aVhttps://api.github.com/repos/rails/rails/issues/27285/comments
+p461
+aVhttps://api.github.com/repos/rails/rails/issues/27282/comments
+p462
+aVhttps://api.github.com/repos/rails/rails/issues/27281/comments
+p463
+aVhttps://api.github.com/repos/rails/rails/issues/27280/comments
+p464
+aVhttps://api.github.com/repos/rails/rails/issues/27278/comments
+p465
+aVhttps://api.github.com/repos/rails/rails/issues/27275/comments
+p466
+aVhttps://api.github.com/repos/rails/rails/issues/27274/comments
+p467
+aVhttps://api.github.com/repos/rails/rails/issues/27273/comments
+p468
+aVhttps://api.github.com/repos/rails/rails/issues/27272/comments
+p469
+aVhttps://api.github.com/repos/rails/rails/issues/27271/comments
+p470
+aVhttps://api.github.com/repos/rails/rails/issues/27269/comments
+p471
+aVhttps://api.github.com/repos/rails/rails/issues/27265/comments
+p472
+aVhttps://api.github.com/repos/rails/rails/issues/27260/comments
+p473
+aVhttps://api.github.com/repos/rails/rails/issues/27259/comments
+p474
+aVhttps://api.github.com/repos/rails/rails/issues/27257/comments
+p475
+aVhttps://api.github.com/repos/rails/rails/issues/27255/comments
+p476
+aVhttps://api.github.com/repos/rails/rails/issues/27254/comments
+p477
+aVhttps://api.github.com/repos/rails/rails/issues/27251/comments
+p478
+aVhttps://api.github.com/repos/rails/rails/issues/27250/comments
+p479
+aVhttps://api.github.com/repos/rails/rails/issues/27249/comments
+p480
+aVhttps://api.github.com/repos/rails/rails/issues/27248/comments
+p481
+aVhttps://api.github.com/repos/rails/rails/issues/27246/comments
+p482
+aVhttps://api.github.com/repos/rails/rails/issues/27244/comments
+p483
+aVhttps://api.github.com/repos/rails/rails/issues/27243/comments
+p484
+aVhttps://api.github.com/repos/rails/rails/issues/27242/comments
+p485
+aVhttps://api.github.com/repos/rails/rails/issues/27240/comments
+p486
+aVhttps://api.github.com/repos/rails/rails/issues/27239/comments
+p487
+aVhttps://api.github.com/repos/rails/rails/issues/27238/comments
+p488
+aVhttps://api.github.com/repos/rails/rails/issues/27236/comments
+p489
+aVhttps://api.github.com/repos/rails/rails/issues/27234/comments
+p490
+aVhttps://api.github.com/repos/rails/rails/issues/27233/comments
+p491
+aVhttps://api.github.com/repos/rails/rails/issues/27232/comments
+p492
+aVhttps://api.github.com/repos/rails/rails/issues/27231/comments
+p493
+aVhttps://api.github.com/repos/rails/rails/issues/27229/comments
+p494
+aVhttps://api.github.com/repos/rails/rails/issues/27228/comments
+p495
+aVhttps://api.github.com/repos/rails/rails/issues/27227/comments
+p496
+aVhttps://api.github.com/repos/rails/rails/issues/27224/comments
+p497
+aVhttps://api.github.com/repos/rails/rails/issues/27223/comments
+p498
+aVhttps://api.github.com/repos/rails/rails/issues/27222/comments
+p499
+aVhttps://api.github.com/repos/rails/rails/issues/27221/comments
+p500
+aVhttps://api.github.com/repos/rails/rails/issues/27220/comments
+p501
+aVhttps://api.github.com/repos/rails/rails/issues/27219/comments
+p502
+aVhttps://api.github.com/repos/rails/rails/issues/27218/comments
+p503
+aVhttps://api.github.com/repos/rails/rails/issues/27217/comments
+p504
+aVhttps://api.github.com/repos/rails/rails/issues/27216/comments
+p505
+aVhttps://api.github.com/repos/rails/rails/issues/27215/comments
+p506
+aVhttps://api.github.com/repos/rails/rails/issues/27214/comments
+p507
+aVhttps://api.github.com/repos/rails/rails/issues/27213/comments
+p508
+aVhttps://api.github.com/repos/rails/rails/issues/27212/comments
+p509
+aVhttps://api.github.com/repos/rails/rails/issues/27211/comments
+p510
+aVhttps://api.github.com/repos/rails/rails/issues/27210/comments
+p511
+aVhttps://api.github.com/repos/rails/rails/issues/27209/comments
+p512
+aVhttps://api.github.com/repos/rails/rails/issues/27207/comments
+p513
+aVhttps://api.github.com/repos/rails/rails/issues/27206/comments
+p514
+aVhttps://api.github.com/repos/rails/rails/issues/27205/comments
+p515
+aVhttps://api.github.com/repos/rails/rails/issues/27204/comments
+p516
+aVhttps://api.github.com/repos/rails/rails/issues/27202/comments
+p517
+aVhttps://api.github.com/repos/rails/rails/issues/27201/comments
+p518
+aVhttps://api.github.com/repos/rails/rails/issues/27200/comments
+p519
+aVhttps://api.github.com/repos/rails/rails/issues/27199/comments
+p520
+aVhttps://api.github.com/repos/rails/rails/issues/27198/comments
+p521
+aVhttps://api.github.com/repos/rails/rails/issues/27197/comments
+p522
+aVhttps://api.github.com/repos/rails/rails/issues/27194/comments
+p523
+aVhttps://api.github.com/repos/rails/rails/issues/27193/comments
+p524
+aVhttps://api.github.com/repos/rails/rails/issues/27192/comments
+p525
+aVhttps://api.github.com/repos/rails/rails/issues/27191/comments
+p526
+aVhttps://api.github.com/repos/rails/rails/issues/27190/comments
+p527
+aVhttps://api.github.com/repos/rails/rails/issues/27189/comments
+p528
+aVhttps://api.github.com/repos/rails/rails/issues/27188/comments
+p529
+aVhttps://api.github.com/repos/rails/rails/issues/27187/comments
+p530
+asS'number'
+p531
+(lp532
+I27286
+aI27285
+aI27282
+aI27281
+aI27280
+aI27278
+aI27275
+aI27274
+aI27273
+aI27272
+aI27271
+aI27269
+aI27265
+aI27260
+aI27259
+aI27257
+aI27255
+aI27254
+aI27251
+aI27250
+aI27249
+aI27248
+aI27246
+aI27244
+aI27243
+aI27242
+aI27240
+aI27239
+aI27238
+aI27236
+aI27234
+aI27233
+aI27232
+aI27231
+aI27229
+aI27228
+aI27227
+aI27224
+aI27223
+aI27222
+aI27221
+aI27220
+aI27219
+aI27218
+aI27217
+aI27216
+aI27215
+aI27214
+aI27213
+aI27212
+aI27211
+aI27210
+aI27209
+aI27207
+aI27206
+aI27205
+aI27204
+aI27202
+aI27201
+aI27200
+aI27199
+aI27198
+aI27197
+aI27194
+aI27193
+aI27192
+aI27191
+aI27190
+aI27189
+aI27188
+aI27187
+asS'codeblocks'
+p533
+(lp534
+(lp535
+a(lp536
+a(lp537
+a(lp538
+a(lp539
+a(lp540
+a(lp541
+a(lp542
+a(lp543
+V```ruby\u000a  after_action do\u000a    logger.info 'Leaked: ' +\u000a      view_paths.first.instance_variable_get(:@cache).instance_variable_get(:@data).size.to_s\u000a  end\u000a```
+p544
+aa(lp545
+a(lp546
+a(lp547
+a(lp548
+a(lp549
+a(lp550
+a(lp551
+V```sh\u000a% rake stats\u000a+----------------------+--------+--------+---------+---------+-----+-------+\u000a| Name                 |  Lines |    LOC | Classes | Methods | M/C | LOC/M |\u000a+----------------------+--------+--------+---------+---------+-----+-------+\u000a| Controllers          |      5 |      3 |       1 |       0 |   0 |     0 |\u000a| Helpers              |      2 |      2 |       0 |       0 |   0 |     0 |\u000a| Jobs                 |      2 |      2 |       1 |       0 |   0 |     0 |\u000a| Models               |     16 |     13 |       3 |       1 |   0 |    11 |\u000a| Mailers              |      4 |      4 |       1 |       0 |   0 |     0 |\u000a| Channels             |     10 |      8 |       2 |       0 |   0 |     0 |\u000a| Javascripts          |     27 |      0 |       0 |       0 |   0 |     0 |\u000a| Libraries            |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Tasks                |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Controller tests     |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Helper tests         |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Model tests          |      7 |      3 |       1 |       0 |   0 |     0 |\u000a| Mailer tests         |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Integration tests    |      0 |      0 |       0 |       0 |   0 |     0 |\u000a+----------------------+--------+--------+---------+---------+-----+-------+\u000a| Total                |     73 |     35 |       9 |       1 |   0 |    33 |\u000a+----------------------+--------+--------+---------+---------+-----+-------+\u000a  Code LOC: 32     Test LOC: 3     Code to Test Ratio: 1:0.1\u000a```\u000a\u000a## After\u000a\u000a```sh\u000a% rake stats\u000a+----------------------+--------+--------+---------+---------+-----+-------+\u000a| Name                 |  Lines |    LOC | Classes | Methods | M/C | LOC/M |\u000a+----------------------+--------+--------+---------+---------+-----+-------+\u000a| Controllers          |      5 |      3 |       1 |       0 |   0 |     0 |\u000a| Helpers              |      2 |      2 |       0 |       0 |   0 |     0 |\u000a| Jobs                 |      2 |      2 |       1 |       0 |   0 |     0 |\u000a| Models               |     16 |     13 |       3 |       1 |   0 |    11 |\u000a| Mailers              |      4 |      4 |       1 |       0 |   0 |     0 |\u000a| Channels             |     10 |      8 |       2 |       0 |   0 |     0 |\u000a| JavaScripts          |     27 |      0 |       0 |       0 |   0 |     0 |\u000a| Libraries            |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Tasks                |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Controller tests     |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Helper tests         |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Model tests          |      7 |      3 |       1 |       0 |   0 |     0 |\u000a| Mailer tests         |      0 |      0 |       0 |       0 |   0 |     0 |\u000a| Integration tests    |      0 |      0 |       0 |       0 |   0 |     0 |\u000a+----------------------+--------+--------+---------+---------+-----+-------+\u000a| Total                |     73 |     35 |       9 |       1 |   0 |    33 |\u000a+----------------------+--------+--------+---------+---------+-----+-------+\u000a  Code LOC: 32     Test LOC: 3     Code to Test Ratio: 1:0.1\u000a```
+p552
+aa(lp553
+V```Ruby\u000aclass IfsDocument < ApplicationRecord\u000a\u000a  # Scopes\u000a  default_scope { order(position: :asc) }\u000a  has_many :ifs_document_versions\u000a  # ..\u000aend\u000a\u000aclass IfsDocumentVersion < ApplicationRecord\u000a  belongs_to :ifs_document\u000a\u000a  # Scopes\u000a  default_scope { order(created_at: :desc) }\u000aend\u000a```\u000a### Steps to reproduce\u000a\u000aThe below version doesn't work.\u000a\u000a```sh\u000a[11] pry(main)> a = IfsDocumentVersion.includes(:ifs_document).unscoped.order("ifs_documents.name")\u000a  IfsDocumentVersion Load (0.7ms)  SELECT "ifs_document_versions".* FROM "ifs_document_versions" ORDER BY ifs_documents.name\u000a=> #<IfsDocumentVersion::ActiveRecord_Relation:0x2adb5edbe174>\u000a[12] pry(main)> a.length\u000a  IfsDocumentVersion Load (0.8ms)  SELECT "ifs_document_versions".* FROM "ifs_document_versions" ORDER BY ifs_documents.name\u000aActiveRecord::StatementInvalid: PG::UndefinedTable: ERROR:  missing FROM-clause entry for table "ifs_documents"\u000aLINE 1: ...versions".* FROM "ifs_document_versions" ORDER BY ifs_docume...\u000a                                                             ^\u000a: SELECT "ifs_document_versions".* FROM "ifs_document_versions" ORDER BY ifs_documents.name\u000afrom /home/deploy/app/releases/448/vendor/bundle/ruby/2.3.0/gems/activerecord-5.0.0/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `async_exec'\u000a```\u000a\u000aWhile the below works:\u000a\u000a```sh\u000a[13] pry(main)> a = IfsDocumentVersion.unscoped.includes(:ifs_document).order("ifs_documents.name")\u000a  SQL (1.5ms)  SELECT "ifs_document_versions"."id" AS t0_r0, "ifs_document_versions"."uuid" AS t0_r1, "ifs_document_versions"."ifs_document_id" AS t0_r2, "ifs_document_ve\u000arsions"."ifs_doc_version" AS t0_r3, "ifs_document_versions"."is_public" AS t0_r4, "ifs_document_versions"."is_validatable" AS t0_r5, "ifs_document_versions"."is_validated\u000a" AS t0_r6, "ifs_document_versions"."validated_by" AS t0_r7, "ifs_document_versions"."validated_at" AS t0_r8, "ifs_document_versions"."is_expirable" AS t0_r9, "ifs_docume\u000ant_versions"."is_expired" AS t0_r10, "ifs_document_versions"."expired_at" AS t0_r11, "ifs_document_versions"."state" AS t0_r12, "ifs_document_versions"."position" AS t0_r\u000a13, "ifs_document_versions"."properties" AS t0_r14, "ifs_document_versions"."created_at" AS t0_r15, "ifs_document_versions"."updated_at" AS t0_r16, "ifs_document_versions\u000a"."deleted_at" AS t0_r17, "public"."ifs_documents"."id" AS t1_r0, "public"."ifs_documents"."uuid" AS t1_r1, "public"."ifs_documents"."ifs_code" AS t1_r2, "public"."ifs_do\u000acuments"."brc_code" AS t1_r3, "public"."ifs_documents"."name" AS t1_r4, "public"."ifs_documents"."description" AS t1_r5, "public"."ifs_documents"."state" AS t1_r6, "publi\u000ac"."ifs_documents"."position" AS t1_r7, "public"."ifs_documents"."properties" AS t1_r8, "public"."ifs_documents"."created_at" AS t1_r9, "public"."ifs_documents"."updated_\u000aat" AS t1_r10, "public"."ifs_documents"."deleted_at" AS t1_r11, "public"."ifs_documents"."category" AS t1_r12, "public"."ifs_documents"."is_public" AS t1_r13, "public"."i\u000afs_documents"."is_validatable" AS t1_r14, "public"."ifs_documents"."is_expirable" AS t1_r15 FROM "ifs_document_versions" LEFT OUTER JOIN "public"."ifs_documents" ON "publ\u000aic"."ifs_documents"."id" = "ifs_document_versions"."ifs_document_id" ORDER BY ifs_documents.name\u000a[14] pry(main)> a.length\u000a=> 7\u000a```
+p554
+aa(lp555
+V```\u000aDEPRECATION WARNING: alias_method_chain is deprecated. Please, use Module#prepend instead. From module, you can access the original method using super. (called from alias_method_chain at /home/mathieu/.rvm/gems/ruby-2.3.1/gems/activesupport-5.0.0.1/lib/active_support/core_ext/module/aliasing.rb:27)\u000aDEPRECATION WARNING: alias_method_chain is deprecated. Please, use Module#prepend instead. From module, you can access the original method using super. (called from alias_method_chain at /home/mathieu/.rvm/gems/ruby-2.3.1/gems/activesupport-5.0.0.1/lib/active_support/core_ext/module/aliasing.rb:27)\u000a```\u000a\u000aAfter\u000a```\u000aDEPRECATION WARNING: alias_method_chain is deprecated. Please, use Module#prepend instead. From module, you can access the original method using super. (called from <class:Ambiguous> at /home/mathieu/.rvm/gems/ruby-2.3.1/gems/cucumber_priority-0.1.2/lib/cucumber_priority/ambiguous_error_ext.rb:11)\u000aDEPRECATION WARNING: alias_method_chain is deprecated. Please, use Module#prepend instead. From module, you can access the original method using super. (called from <class:SupportCode> at /home/mathieu/.rvm/gems/ruby-2.3.1/gems/cucumber_priority-0.1.2/lib/cucumber_priority/support_code_ext.rb:29)\u000a\u000a```
+p556
+aa(lp557
+V```ruby\u000aclass Post < ActiveRecord::Base\u000a  has_many :comments, inverse_of: :post\u000aend\u000a\u000aclass Comment < ActiveRecord::Base\u000a  belongs_to :post\u000a\u000a  after_save do\u000a    puts post.comments.count #=> expected 1, got: 0\u000a    puts post.comments.reload.count #=> expected: 1, got: 1\u000a  end\u000aend\u000a\u000apost = Post.new\u000apost.comments.build\u000apost.save!\u000a```
+p558
+aa(lp559
+a(lp560
+a(lp561
+a(lp562
+V```\u000aBugTest#test_price_as_float:\u000aActiveRecord::StatementInvalid: PG::InvalidTextRepresentation: ERROR:  invalid input syntax for type money: "1.4000000000000000E+01"\u000a: INSERT INTO "items" ("price") VALUES ($1) RETURNING "id"\u000a```
+p563
+aa(lp564
+a(lp565
+V```t.index ["user_id", "uri"], name: "index_posts_on_user_id_and_uri", length: {"user_id"=>nil, "uri"=>255}, using: :btree```\u000a\u000aError message: ```Mysql2::Error: Specified key was too long; max key length is 767 bytes: CREATE TABLE `posts` (`id` int AUTO_INCREMENT PRIMARY KEY, `user_id` int NOT NULL, `uri` varchar(4096) NOT NULL,  INDEX `index_posts_on_user_id_and_uri` USING btree (`user_id`, `uri`)) ENGINE=InnoDB (ActiveRecord::StatementInvalid)```
+p566
+aa(lp567
+a(lp568
+a(lp569
+a(lp570
+V```\u000abegin\u000a  require "bundler/inline"\u000arescue LoadError => e\u000a  $stderr.puts "Bundler version 1.10 or later is required. Please update your Bundler"\u000a  raise e\u000aend\u000a\u000agemfile(true) do\u000a  source "https://rubygems.org"\u000a  # Activate the gem you are reporting the issue against.\u000a  gem "activesupport", "5.0.0"\u000aend\u000a\u000arequire "active_support/core_ext/object/blank"\u000arequire "minitest/autorun"\u000a\u000a# Ensure backward compatibility with Minitest 4\u000aMinitest::Test = MiniTest::Unit::TestCase unless defined?(Minitest::Test)\u000a\u000arequire "active_support/core_ext/class/subclasses"\u000aPants = Class.new\u000a\u000aclass BugTest < Minitest::Test\u000a  def test_stuff\u000a    Pants.new.singleton_class\u000a\u000a    assert_equal Pants.descendants, []\u000a  end\u000aend\u000a\u000a```\u000a\u000a### Expected behavior\u000a\u000a`Class.descendants` and `Class.subclasses` should not return singleton classes (test should pass).\u000a\u000a### Actual behavior\u000a\u000a```Fetching gem metadata from https://rubygems.org/..............\u000aFetching version metadata from https://rubygems.org/.\u000aResolving dependencies...\u000aUsing concurrent-ruby 1.0.2\u000aUsing minitest 5.9.1\u000aUsing i18n 0.7.0\u000aUsing bundler 1.13.6\u000aUsing thread_safe 0.3.5\u000aUsing tzinfo 1.2.2\u000aUsing activesupport 5.0.0 (was 4.2.7.1)\u000aRun options: --seed 39273\u000a\u000a# Running:\u000a\u000aF\u000a\u000aFinished in 0.011394s, 87.7655 runs/s, 87.7655 assertions/s.\u000a\u000a  1) Failure:\u000aBugTest#test_stuff [as_test.rb:28]:\u000aExpected: [#<Class:#<Pants:0x007f90c4036310>>]\u000a  Actual: []\u000a\u000a1 runs, 1 assertions, 1 failures, 0 errors, 0 skips\u000a```
+p571
+aa(lp572
+V```\u000ab = Bar.new\u000ab.foo = "test string"\u000ab.foo\u000a```
+p573
+aa(lp574
+a(lp575
+a(lp576
+a(lp577
+V```\u000am:   4,001,968 | c:  34,507 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/mapper.rb\u000am:   2,795,971 | c:  40,516 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb\u000am:   1,590,197 | c:  19,996 | String\u000am:   1,050,224 | c:       1 | Thread\u000am:   1,031,028 | c:  13,000 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/mime-types-2.6.2/lib/mime/type.rb\u000am:     878,323 | c:   9,916 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/journey/scanner.rb\u000am:     795,753 | c:   1,373 | Regexp	/Users/jfrey/.gem/ruby/2.3.3/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb\u000am:     783,666 | c:   8,546 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/activesupport-5.0.0.1/lib/active_support/file_update_checker.rb\u000am:     724,594 | c:   6,196 | String	/Users/jfrey/.rubies/ruby-2.3.3/lib/ruby/2.3.0/racc/parser.rb\u000am:     716,112 | c:   3,642 | Hash	/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/mapper.rb\u000a```\u000a\u000aAfter (one-route-per-whitelist-entry)\u000a\u000a```\u000am:   5,488,795 | c:  53,801 | String\u000am:   2,945,515 | c:  28,409 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/mapper.rb\u000am:   2,128,864 | c:  12,364 | Hash	/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/mapper.rb\u000am:   2,116,517 | c:  34,803 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb\u000am:   1,633,744 | c:  36,181 | Array	/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/journey/visitors.rb\u000am:   1,312,363 | c:  24,171 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/journey/scanner.rb\u000am:   1,144,800 | c:   4,610 | Hash\u000am:   1,104,080 | c:  27,602 | ActionDispatch::Journey::Nodes::Cat	/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/journey/parser.rb\u000am:   1,050,224 | c:       1 | Thread\u000am:   1,031,028 | c:  13,000 | String	/Users/jfrey/.gem/ruby/2.3.3/gems/mime-types-2.6.2/lib/mime/type.rb\u000a```
+p578
+aa(lp579
+a(lp580
+a(lp581
+V```\u000aattachments[:rails] = xxx\u000amail(\u000a  body: "<html><body>Hello rails</body></html>",\u000a  content_type: "text/html"\u000a)\u000a# => content_type is now text/hml\u000a```
+p582
+aa(lp583
+a(lp584
+a(lp585
+V```\u000a## product model\u000a serialize :properties, Hash\u000a\u000a##product migration\u000a    add_column :products, :properties, :text\u000a```
+p586
+aa(lp587
+V```\u000a |2.3.0| workify in ~/Documents/rails/rails/railties\u000a± |current_is_not_used \u2713| \u2192 ruby -I"lib:test" test/paths_test.rb\u000aRun options: --seed 61508\u000a\u000a# Running:\u000a\u000a....................................\u000a\u000aFinished in 0.004794s, 7508.9356 runs/s, 13766.3820 assertions/s.\u000a\u000a36 runs, 66 assertions, 0 failures, 0 errors, 0 skips\u000a```
+p588
+aa(lp589
+V```\u000a*   Add Yarn support in new apps using --yarn option. This adds a package.json\u000a    and the settings needed to get npm modules integrated in new apps.\u000a\u000a    *Liceth Ovalles*, *Guillermo Iguaran*\u000a```
+p590
+aa(lp591
+a(lp592
+V```json\u000a{"raw_attributes": {"id": null}, "attributes": {attributes: {"id": {name: "id", value_before_type_cast: null,\u000a        type: {precision: null, scale: null, limit: null, range: {"begin": -2147483648,\u000a            "end": 2147483648, "excl": true}}, original_attribute: null}}}, "new_record": true,\u000a  "active_record_yaml_version": 1}\u000a```
+p593
+aa(lp594
+a(lp595
+a(lp596
+a(lp597
+a(lp598
+V```ruby\u000abegin\u000a  require "bundler/inline"\u000arescue LoadError => e\u000a  $stderr.puts "Bundler version 1.10 or later is required. Please update your Bundler"\u000a  raise e\u000aend\u000a\u000agemfile(true) do\u000a  source "https://rubygems.org"\u000a  # Activate the gem you are reporting the issue against.\u000a  gem "activerecord", "5.0.0"\u000a  gem "sqlite3"\u000aend\u000a\u000arequire "active_record"\u000arequire "minitest/autorun"\u000arequire "logger"\u000a\u000a# Ensure backward compatibility with Minitest 4\u000aMinitest::Test = MiniTest::Unit::TestCase unless defined?(Minitest::Test)\u000a\u000a# This connection will do for database-independent bug reports.\u000aActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")\u000aActiveRecord::Base.logger = Logger.new(STDOUT)\u000a\u000aActiveRecord::Schema.define do\u000a  create_table :posts, force: true do |t|\u000a  end\u000a\u000a  create_table :comments, force: true do |t|\u000a    t.integer :post_id\u000a    t.string :foo\u000a  end\u000aend\u000a\u000aclass Post < ActiveRecord::Base\u000a  has_many :comments\u000aend\u000a\u000aclass Comment < ActiveRecord::Base\u000a  belongs_to :post\u000a\u000a  default_scope -> { where(foo: "bar") }\u000aend\u000a\u000aclass BugTest < Minitest::Test\u000a  def test_join_default_scope\u000a    actual_query   = Post.joins(:comments).merge(Comment.unscoped).to_sql\u000a    expected_query = "SELECT \u005c"posts\u005c".* FROM \u005c"posts\u005c" INNER JOIN \u005c"comments\u005c" ON \u005c"comments\u005c".\u005c"post_id\u005c" = \u005c"posts\u005c".\u005c"id\u005c""\u000a\u000a    assert_equal expected_query, actual_query\u000a  end\u000aend\u000a\u000a```
+p599
+aa(lp600
+a(lp601
+V```\u000aclass TestController < ActionController::API\u000a  include ActionView::Rendering\u000a\u000a  def index\u000a    render json: {page: "Home"}\u000a  end\u000aend\u000a```
+p602
+aa(lp603
+V```\u000abegin\u000a  require "bundler/inline"\u000arescue LoadError => e\u000a  $stderr.puts "Bundler version 1.10 or later is required. Please update your Bundler"\u000a  raise e\u000aend\u000a\u000agemfile(true) do\u000a  source "https://rubygems.org"\u000a  gem 'rails', '5.0.0.beta2'\u000a  gem "pg"\u000aend\u000a\u000arequire "active_record"\u000arequire "minitest/autorun"\u000arequire "logger"\u000a\u000a# This connection will do for database-independent bug reports.\u000aActiveRecord::Base.establish_connection(adapter: "postgresql", database: ":memory:")\u000aActiveRecord::Base.logger = Logger.new(STDOUT)\u000a\u000aActiveRecord::Schema.define do\u000a  create_table :instructors, force: true do |t|\u000a    t.string :tags, array: true, default: []\u000a  end\u000aend\u000a\u000aclass Instructor < ActiveRecord::Base\u000aend\u000a\u000aclass BugTest < Minitest::Test\u000a  def test_association_stuff\u000a    instructor = Instructor.create!(tags: ['asas', 'asdada'])\u000a    assert_equal ['asas', 'asdada'], instructor.tags\u000a\u000a    instructor.tags << '\u041f\u0440\u0438\u0432\u0435\u0442'\u000a    instructor.save\u000a    same_instructor_loaded_agin = Instructor.find(instructor.id)\u000a    assert_equal ['asas', 'asdada', '\u041f\u0440\u0438\u0432\u0435\u0442'], same_instructor_loaded_agin.tags\u000a    assert_equal ['asas', 'asdada', '\u041f\u0440\u0438\u0432\u0435\u0442'], instructor.tags\u000a  end\u000aend\u000a```
+p604
+aa(lp605
+a(lp606
+a(lp607
+V```\u000a$ cd activemodel\u000a$ NO_FORK=1 bundle exec rake test\u000a```\u000a\u000aIf we wrap original arguments in quotes, it will be considered as a one big single argument. Later, [`rake/rake_test_loader.rb`](https://github.com/ruby/rake/blob/7863b97/lib/rake/rake_test_loader.rb#L15) will iterate over ARGS and try to require that huge single "argument" (which is a list of multiple .rb files). This leads to an exception:\u000a\u000a```\u000a/Users/kir/Project\u000as/opensource/rails/vendor/bundle/gems/rake-11.3.0/lib/rake/rake_test_loader.rb:15:in `require': cannot load such file -- /Users/kir/Projects/opensource/rails/activemodel/test/cases/\u000aattribute_assignment_test.rb [stripped] /Users/kir/Projects/opensource/rails/activemodel/test/cases/validations/with_validation_test.rb /Users/kir/Projects/opensource/rails/activemodel/test/cases/validations_test\u000a.rb (LoadError)\u000a\u000a        from /Users/kir/Projects/opensource/rails/vendor/bundle/gems/rake-11.3.0/lib/rake/rake_test_loader.rb:15:in `block in <main>'\u000a        from /Users/kir/Projects/opensource/rails/vendor/bundle/gems/rake-11.3.0/lib/rake/rake_test_loader.rb:4:in `select'\u000a        from /Users/kir/Projects/opensource/rails/vendor/bundle/gems/rake-11.3.0/lib/rake/rake_test_loader.rb:4:in `<main>'\u000a```
+p608
+aa(lp609
+V```\u000a#app/models/user.rb\u000aclass User < ApplicationRecord\u000aend\u000a\u000a#app/models/man.rb\u000aclass Man < User\u000a  has_one :profile, class_name: "Man::Profile", dependent: :destroy, foreign_key: :users_id\u000aend\u000a\u000a#app/models/man/profile.rb\u000aclass Man::Profile < ApplicationRecord\u000a  belongs_to :man, foreign_key: :users_id\u000aend\u000a\u000a#app/models/company.rb\u000aclass Company < User\u000a  has_one :profile, class_name: "Company::Profile", dependent: :destroy, foreign_key: :users_id\u000aend\u000a\u000a#app/models/company/profile.rb\u000aclass Company::Profile < ApplicationRecord\u000a  belongs_to :company, foreign_key: :users_id\u000aend\u000a```
+p610
+aa(lp611
+a(lp612
+a(lp613
+V````\u000adescribe ActiveRecord::Base do\u000a\u000a    describe "previous_changes" do\u000a\u000a        it "should not include a json field changing from nil to nil" do\u000a            user = User.where(provider_user_info: nil).first\u000a            user.save!\u000a\u000a            expect(user.previous_changes['provider_user_info']).to be_nil\u000a        end\u000a\u000a    end\u000a\u000aend\u000a````
+p614
+aa(lp615
+a(lp616
+a(lp617
+V```ruby\u000a# before\u000aparams[:age] = 30 unless params[:age]\u000a\u000a# after\u000aparams.reverse_merge(age: 30)\u000a```
+p618
+aa(lp619
+V```\u000adef with_defaults(defaults)\u000a  self.class.new controller, normalize_keys(env.merge(defaults)), self.defaults.merge(defaults)\u000aend\u000a```
+p620
+aa(lp621
+a(lp622
+a(lp623
+V```ruby\u000aPet.left_joins(:toys).where(:toys => {:name => 'Bone'}).update_all(name: "Bob")\u000aPet.left_joins(:toys).where(:toys => {:name => 'Bone'}).delete_all\u000a```
+p624
+aa(lp625
+V```ruby\u000aclass ChatChannelTest < ActionCable::Channel::TestCase\u000a  def test_subscribed_with_room_number\u000a    # Simulate a subscription creation\u000a    subscribe room_number: 1\u000a\u000a    # Asserts that the subscription was successfully created\u000a    assert subscription.confirmed?\u000a\u000a    # Asserts that the channel subscribes connection to a stream\u000a    assert "chat_1", streams.last\u000a  end\u000a  \u000a  def test_subscribed_without_room_number\u000a     subscribe\u000a\u000a     # Asserts that the subscription was rejected\u000a     assert subscription.rejected?\u000a  end\u000a  \u000a  def test_perform_speak\u000a    subscribe room_number: 1\u000a\u000a    perform :speak, message: "Hello, Rails!"\u000a    \u000a    assert_equal "Hello, Rails!", transmissions.last["message"]["text"]\u000a  end\u000aend\u000a```
+p626
+aa(lp627
+a(lp628
+V```ruby\u000a<%= form_for(:post, url: post_path(@post), method: :patch) do |f| %>\u000a```\u000a\u000aTry to submit the edit form with the title length less than 5\u000a\u000a### Expected behavior\u000aOn submitting the form the following error will be raised\u000aActionController::UrlGenerationError in Articles#update\u000a\u000athe full traceback\u000a```\u000aActionController::UrlGenerationError in Posts#update\u000aShowing D:/SourceCodesAll/ruby/rails_starter/blog/app/views/posts/edit.erb where line #3 raised:\u000a\u000aNo route matches {:action=>"show", :controller=>"posts", :id=>nil} missing required keys: [:id]\u000aRails.root: D:/SourceCodesAll/ruby/rails_starter/blog\u000a\u000aApplication Trace | Framework Trace | Full Trace\u000aapp/views/posts/edit.erb:3:in `_app_views_posts_edit_erb__9863216_77879280'\u000aapp/controllers/posts_controller.rb:32:in `update'\u000aRequest\u000a\u000aParameters:\u000a\u000a{"utf8"=>"\u2713",\u000a "_method"=>"patch",\u000a "authenticity_token"=>"S7tRNCapaUmzxi4w4B1i5/kV2aAya6GbpSF/40vMiwk1d7ONkw054I8mqk8ZV8XzDrdUFN9CW1bi/pxuvqNQfA==",\u000a "post"=>{"title"=>"erer",\u000a "body"=>"cgccgfg"},\u000a "commit"=>"Save Post",\u000a "id"=>"4"}\u000a```
+p629
+aa(lp630
+V```\u000aError:\u000aTestAdapterWithInvalidConnection#test_inspect_on_Model_class_does_not_raise:\u000aGem::LoadError: Specified 'mysql' for database adapter, but the gem is not loaded. Add `gem 'mysql'` to your Gemfile (and ensure its version is at the minimum required by ActiveRecord).\u000a    /home/oz/code/rails/activerecord/lib/active_record/connection_adapters/connection_specification.rb:177:in `rescue in spec'\u000a    /home/oz/code/rails/activerecord/lib/active_record/connection_adapters/connection_specification.rb:174:in `spec'\u000a    /home/oz/code/rails/activerecord/lib/active_record/connection_handling.rb:50:in `establish_connection'\u000a    /home/oz/code/rails/activerecord/test/cases/invalid_connection_test.rb:12:in `setup'\u000a```
+p631
+aa(lp632
+as.

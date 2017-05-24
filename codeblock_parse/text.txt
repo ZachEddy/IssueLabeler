@@ -1,0 +1,10 @@
+def create
+  @user = User.new(user_params)
+  if @user.save
+    flash[:notice] = "User saved to database."
+    redirect_to user_url @user
+  else
+    flash.now[:alert] = "Error: #{@user.errors.full_messages.join(', ')}"
+    render :new
+  end
+end

@@ -1,0 +1,157 @@
+===================================================
+one invalid token right after the viable prefix
+===================================================
+
+if (a b) {
+  c d;
+}
+e f;
+
+---
+
+(program
+  (if_statement
+    (ERROR (identifier))
+    (identifier)
+    (statement_block
+      (ERROR (identifier))
+      (expression_statement (identifier))))
+  (ERROR (identifier))
+  (expression_statement (identifier)))
+
+=======================================================
+multiple invalid tokens right after the viable prefix
+=======================================================
+
+if (a b c) {
+  d e f g;
+}
+h i j k;
+
+---
+
+(program
+  (if_statement
+    (ERROR (identifier) (identifier))
+    (identifier)
+    (statement_block
+      (ERROR (identifier) (identifier) (identifier))
+      (expression_statement (identifier))))
+  (expression_statement
+    (ERROR (identifier) (identifier) (identifier))
+    (identifier)))
+
+===================================================
+one invalid subtree right after the viable prefix
+===================================================
+
+if ({a: 'b'} {c: 'd'}) {
+  x = function(a) { b; } function(c) { d; }
+}
+
+---
+
+(program
+  (if_statement
+    (object (pair (identifier) (string)))
+    (ERROR (object (pair (identifier) (string))))
+    (statement_block
+      (expression_statement (assignment
+        (identifier)
+        (ERROR (function
+          (formal_parameters (identifier))
+          (statement_block (expression_statement (identifier)))))
+        (function
+          (formal_parameters (identifier))
+          (statement_block (expression_statement (identifier)))))))))
+
+===================================================
+one invalid token at the end of the file
+===================================================
+
+// skip the equals sign
+a.b =
+---
+
+(program
+  (comment)
+  (trailing_expression_statement
+    (member_access (identifier) (identifier)))
+  (ERROR))
+
+=================================================================
+An invalid token at the end of a construct with extra line breaks
+=================================================================
+
+a(
+  b,
+  c,,
+);
+
+---
+
+(program
+  (expression_statement
+    (function_call (identifier) (arguments
+      (identifier)
+      (identifier)
+      (ERROR)))))
+
+===================================================
+Multi-line chained expressions in var declarations
+===================================================
+
+const one = two
+  .three(four)
+  .five()
+
+---
+
+(program
+  (var_declaration (var_assignment
+    (identifier)
+    (function_call
+      (member_access
+        (function_call
+          (member_access (identifier) (identifier))
+          (arguments (identifier)))
+        (identifier))
+      (arguments)))))
+
+===================================================
+Errors after a sequence of function declarations
+===================================================
+
+/*
+ * The JS grammar has an ambiguity such that these functions
+ * can be parsed either as function declarations or as
+ * function expressions. This ambiguity causes a lot of
+ * splitting and merging in the parse stack. When iterating
+ * the parse stack during an error repair, there would then
+ * be a very large number (> 2^16) of paths through the parse
+ * stack.
+ */
+function a() {}
+function b() {}
+function c() {}
+function e() {}
+function f() {}
+function g() {}
+function h() {}
+function i() {}
+
+var x = !!!
+
+---
+
+(program
+  (comment)
+  (expression_statement (function (identifier) (formal_parameters) (statement_block)))
+  (expression_statement (function (identifier) (formal_parameters) (statement_block)))
+  (expression_statement (function (identifier) (formal_parameters) (statement_block)))
+  (expression_statement (function (identifier) (formal_parameters) (statement_block)))
+  (expression_statement (function (identifier) (formal_parameters) (statement_block)))
+  (expression_statement (function (identifier) (formal_parameters) (statement_block)))
+  (expression_statement (function (identifier) (formal_parameters) (statement_block)))
+  (expression_statement (function (identifier) (formal_parameters) (statement_block)))
+  (trailing_var_declaration (identifier)) (ERROR))

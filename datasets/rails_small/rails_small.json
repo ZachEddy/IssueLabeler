@@ -1,0 +1,1624 @@
+[
+ {
+  "body":"### Summary\r\n\r\nIn #27126, @kamipo updated the regex matcher for `unsigned?` to exclude enum and set types. There was a discussion on why the change was necessary, and I thought it might be worthwhile to include the reasoning in with the code for future readers.\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27286/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"006b75",
+    "default":false,
+    "id":41328116,
+    "name":"attached PR",
+    "url":"https://api.github.com/repos/rails/rails/labels/attached%20PR"
+   },
+   {
+    "color":"fef2c0",
+    "default":false,
+    "id":309390193,
+    "name":"MySQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/MySQL"
+   }
+  ],
+  "number":27286,
+  "title":"[ci skip] Document regex change"
+ },
+ {
+  "body":"### Summary\r\n\r\nDoc code sample generates syntax error, needs parenthesis around .find_by_identity parameter.\r\n\r\nSeemed clearer to remove local variable (named after method/attribute, bad) and if/else/end statement, then replace with '||' operator\r\n\r\nFYI, came across this working on a YARD based doc system, it uses Ripper for code highlighting, and I noticed this section wasn't highlighted...",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27285/comments",
+  "labels":[
+   {
+    "color":"bfdadc",
+    "default":false,
+    "id":300028327,
+    "name":"actioncable",
+    "url":"https://api.github.com/repos/rails/rails/labels/actioncable"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27285,
+  "title":"ActionCable::Connection::Base doc code sample syntax error"
+ },
+ {
+  "body":"### Summary\r\n\r\nProvide a general description of the code changes in your pull\r\nrequest... were there any bugs you had fixed? If so, mention them. If\r\nthese bugs have open GitHub issues, be sure to tag them here as well,\r\nto keep the conversation linked together.\r\n\r\n### Other Information\r\n\r\nIf there's anything else that's important and relevant to your pull\r\nrequest, mention that information here. This could include\r\nbenchmarks, or other information.\r\n\r\nIf you are updating any of the CHANGELOG files or are asked to update the\r\nCHANGELOG files by reviewers, please add the CHANGELOG entry at the top of the file.\r\n\r\nFinally, if your pull request affects documentation or any non-code\r\nchanges, guidelines for those changes are [available\r\nhere](http://guides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation)\r\n\r\nThanks for contributing to Rails!\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27284/comments",
+  "labels":[],
+  "number":27284,
+  "title":"5 0 stable"
+ },
+ {
+  "body":"### Summary\r\n\r\nProvide a general description of the code changes in your pull\r\nrequest... were there any bugs you had fixed? If so, mention them. If\r\nthese bugs have open GitHub issues, be sure to tag them here as well,\r\nto keep the conversation linked together.\r\n\r\n### Other Information\r\n\r\nIf there's anything else that's important and relevant to your pull\r\nrequest, mention that information here. This could include\r\nbenchmarks, or other information.\r\n\r\nIf you are updating any of the CHANGELOG files or are asked to update the\r\nCHANGELOG files by reviewers, please add the CHANGELOG entry at the top of the file.\r\n\r\nFinally, if your pull request affects documentation or any non-code\r\nchanges, guidelines for those changes are [available\r\nhere](http://guides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation)\r\n\r\nThanks for contributing to Rails!\r\n\r\nRuby Tutorial",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27283/comments",
+  "labels":[],
+  "number":27283,
+  "title":"Ruby Tutorial"
+ },
+ {
+  "body":"### Summary\r\n\r\nCurrently, we use `headers[:content_type]` but I think it should be from class default variable `self.class.default[:content_type]`. Because in `set_content_type`, we named the third variable as `class_default`\r\n\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27282/comments",
+  "labels":[
+   {
+    "color":"8B00FC",
+    "default":false,
+    "id":107188,
+    "name":"actionmailer",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionmailer"
+   }
+  ],
+  "number":27282,
+  "title":"Wrong variable name in action mailer "
+ },
+ {
+  "body":"We'd like to be able to better present errors that occur when a record\r\npasses in-memory validation but fails to insert or update to the\r\ndatabase due to a null constraint on a column. Introduce\r\nActiveRecord::NotNull as a wrapper around these database errors, and\r\nrescue this error type when the Postgres adapter raises a\r\nPG::NotNullViolation, is asked to translate to a handleable error, and\r\nreturns a AR::NotNull. Since we'll need to know what column caused the\r\nissue to correctly display the error, we have the connection adapter\r\nparse the PG::NotNullViolation message to extract the column. The\r\nAR::NotNull is then rescued, a :blank error is added to the appropriate\r\ncolumn on the model, and an ActiveRecord::RecordInvalid is raised.\r\n\r\nIn applications developers generally see PG::NotNullViolations in their\r\nlogs or bug trackers when they've set a null constraint on a column but\r\nhave not defined a corresponding presence validation on the model. This\r\noften manifests as a 500 response to application users when they've not\r\npopulated a specific column, but isn't presented in a good way as it\r\nwould be if the validation were present.\r\n\r\nWrap the PG::NotNullViolation in an ActiveRecord error with knowledge of\r\nthe column which caused the error.\r\n\r\nAR::NotNull provides the standard interface that connection adapters can\r\nuse to inform us of not null constraint violations. This allows us to\r\nrescue them in order to provide a familiar and useful interface to\r\ninvalid records: the ActiveRecord::RecordInvalid error combined with\r\npopulating `errors[column]` with a \"blank\" error as if the model had\r\ndefined the presence validation implied by the null constraint.\r\n\r\nRescue ActiveRecord::NotNull, populate errors[column] with an\r\nappropriate `:blank` message, and raise RecordInvalid.\r\n\r\nThis process allows us to take an unfriendly error for developers, which\r\nlikely results in a 500 response for end-users, and present it in a\r\nfamiliar, actionable way that will probably already be handled by\r\nredirects to a form with styles and messaging to assist in resolving the\r\nproblem.\r\n\r\n       +-----------------------------+\r\n       | ActiveRecord::RecordInvalid |\r\n       |  errors.add(column, :blank) |\r\n       +--------------^--------------+\r\n                      |\r\n    +-----------------------------------+\r\n    | ActiveRecord::NotNull.new(column) |\r\n    +-----------------^-----------------+\r\n                      |\r\n           +----------+-----------+\r\n           | PG::NotNullViolation |\r\n           +----------------------+\r\n\r\nThis PR is a proof-of-concept for adapting these error messages into\r\nactionable AR::RecordInvalids with useful errors populated for columns.\r\nOther potential applications of adapting messaging from the database to\r\nuseful ActiveModel/ActiveRecord::Errors include:\r\n\r\n* Errors for missing associations from foreign key constraints\r\n* Errors for comparisons and numericality from CHECK constraints\r\n* Clusivity errors\r\n* Length errors\r\n* Uniqueness errors from index violations\r\n* etc.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27281/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"ededed",
+    "default":false,
+    "id":128692,
+    "name":"needs feedback",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20feedback"
+   },
+   {
+    "color":"fbca04",
+    "default":false,
+    "id":70310659,
+    "name":"PostgreSQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/PostgreSQL"
+   }
+  ],
+  "number":27281,
+  "title":"Translate PG::NotNullViolation \u2192 AR::RecordInvalid"
+ },
+ {
+  "body":"### Summary\r\n\r\nClarifying some of the language/punctuation and removing a couple [comma splices](https://en.wikipedia.org/wiki/Comma_splice).",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27280/comments",
+  "labels":[
+   {
+    "color":"8BE06E",
+    "default":false,
+    "id":107195,
+    "name":"railties",
+    "url":"https://api.github.com/repos/rails/rails/labels/railties"
+   }
+  ],
+  "number":27280,
+  "title":"Update puma.rb"
+ },
+ {
+  "body":"### Summary\r\n\r\n`#sort_by` is faster than `#sort`, so speed improves.\r\n\r\n### Benchmark\r\n\r\n```rb\r\nrequire \"benchmark\"\r\n\r\nhash = {}\r\n10_000_000.times { |i| hash[i] = rand(100_000) } \r\n\r\nputs RUBY_VERSION\r\nputs \"sort: #{Benchmark.realtime { hash.keys.sort { |a, b| hash[a].to_f <=> hash[b].to_f } }}\"\r\nputs \"sort_by: #{Benchmark.realtime { hash.keys.sort_by { |v| hash[v].to_f } }}\"\r\n\r\n# => 2.3.3\r\n# => sort: 80.61629199999152\r\n# => sort_by: 11.888424000004306\r\n```",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27279/comments",
+  "labels":[],
+  "number":27279,
+  "title":"Use #sort_by instead of #sort"
+ },
+ {
+  "body":"Actually the `primary_key` definition is not used but the inconsistency\r\nis confusing. Actual definition is `bigint auto_increment PRIMARY KEY`\r\nso `UNSIGNED` and `(8)` is unnecessary.\r\n\r\nSee also #21607.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27278/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"fef2c0",
+    "default":false,
+    "id":309390193,
+    "name":"MySQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/MySQL"
+   }
+  ],
+  "number":27278,
+  "title":"Should be sync the `primary_key` definition with actually created"
+ },
+ {
+  "body":"",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27277/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27277,
+  "title":"Remove unnecessary `connection_name` variable"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\n- extend ActiveRecord::Base:\r\n\r\n```ruby\r\n# config/initializers/extend_module.rb\r\nmodule Nothing; end\r\nActiveRecord::Base.extend Nothing\r\n```\r\n\r\n### Expected behavior\r\nPresence validation on `belongs_to` relationships exist\r\n\r\n### Actual behavior\r\nThe built in presence validation on `belongs_to` relationships no longer exist. The validation will exist if you explicitly pass `optional: false`, but no longer exists by default.\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0.1\r\n\r\n**Ruby version**: 2.3.1\r\n\r\nI've provided a sample application with minimal functionality required to demonstrate this issue: https://github.com/efatsi/testing-rails5\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27276/comments",
+  "labels":[],
+  "number":27276,
+  "title":"Extending ActiveRecord::Base breaks presence validation on belongs_to relations"
+ },
+ {
+  "body":"Because defunct wrapper class is kept for compatibility.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27275/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27275,
+  "title":"Should inherit `StatementInvalid` rather than `WrappedDatabaseException`"
+ },
+ {
+  "body":"Follow up to #27272.\r\n\r\nr? @matthewd ",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27274/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27274,
+  "title":"Make `:auto_increment` option works on `:bigint`"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nAdd lines to `ApplicationController`:\r\n```ruby\r\n  after_action do\r\n    logger.info 'Leaked: ' +\r\n      view_paths.first.instance_variable_get(:@cache).instance_variable_get(:@data).size.to_s\r\n  end\r\n```\r\n\r\nRefresh page few times. See the number is increasing.\r\n\r\nIt's related to #20384. Digests are cleared, but not cache objects. I haven't found easy way to clear all caches, as every controller seems to have its own.\r\n\r\n### Expected behavior\r\n\r\nCache size should not be incremented infinitely.\r\n\r\n### Actual behavior\r\n\r\nIt's incremented infinitely.\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0.1\r\n\r\n**Ruby version**: 2.3\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27273/comments",
+  "labels":[
+   {
+    "color":"d7e102",
+    "default":false,
+    "id":3666649,
+    "name":"actionview",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionview"
+   },
+   {
+    "color":"ededed",
+    "default":false,
+    "id":128692,
+    "name":"needs feedback",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20feedback"
+   }
+  ],
+  "number":27273,
+  "title":"Memory leak in development"
+ },
+ {
+  "body":"Using `:auto_increment` option for abstracting the DB-specific auto\r\nincremental types. It is worth to ease to implement the compatibility\r\nlayer.\r\n\r\nI think that this will help to implement #26266.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27272/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27272,
+  "title":"Make `:auto_increment` to internal primary key option"
+ },
+ {
+  "body":"__TL/DR__ `rspec spec/integration`. Before: 35sec. After patch: 20sec. \r\n\r\n#20384 implemented template digest expiry for dev requests. It's enabled by default for test env, which is not required and degradates test performance.\r\n\r\nI'm not sure if there should be testcase for this commit.\r\n\r\n__UPD__ There is failing test on travis. But it's for actioncable, and passes locally for me.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27271/comments",
+  "labels":[
+   {
+    "color":"d7e102",
+    "default":false,
+    "id":3666649,
+    "name":"actionview",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionview"
+   },
+   {
+    "color":"ededed",
+    "default":false,
+    "id":128692,
+    "name":"needs feedback",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20feedback"
+   }
+  ],
+  "number":27271,
+  "title":"Don't clear digest cache in test environment"
+ },
+ {
+  "body":"### Expected behavior\r\nIt feels kinda buggy that currently if you have a case like `'\u0417\u0434\u0440\u0430\u0432\u0441\u0442\u0432\u0443\u0439\u0442\u0435'.parameterize` returns `''` \r\n\r\nIt would be nice if `.parameterize` could be configured to generate slugs with unicode characters preserved.\r\n\r\nWould something like this be a reasonable change?\r\n___\r\n\r\n```\r\ndef parameterize(string, sep = :unused, separator: '-', preserve_case: false, preserve_unicode: false)\r\n``` \r\n\r\nAnd if the `preserve_unicode: true` was passed we would use a different regex like: `^p{Alnum}` over `^a-z0-9`\r\n___",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27270/comments",
+  "labels":[],
+  "number":27270,
+  "title":"Parameterize strips unicode characters"
+ },
+ {
+  "body":"### Summary\r\n\r\nAdjusted API Documentation of `link_to` method in `url_helper.rb` to talk about link instead of button in `disable_with` section. Also removed reference to form in this section as a form is not necessarily involved.\r\n\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27269/comments",
+  "labels":[
+   {
+    "color":"d7e102",
+    "default":false,
+    "id":3666649,
+    "name":"actionview",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionview"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27269,
+  "title":"[ci skip] Remove button reference in `link_to` api doc"
+ },
+ {
+  "body":"http://edgeguides.rubyonrails.org/autoloading_and_reloading_constants.html\r\n\r\nIt mentions eager load but doesn't explain how to use it. It is explained how to use autoload but autoload does not work reliably in production environment especially with threads. I think document should explain autoload should not be used at all and explain how eager loading is to be used, e.g.:\r\n```\r\nconfig.eager_load_paths << \"#{Rails.root}/lib\"\r\n```\r\n\r\nMy understanding is bases on #13142 as well on my personal bad experience with a new app I'm writing. But I'm too new to rails to take on actually wording the docs. Thus filing an issue.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27268/comments",
+  "labels":[],
+  "number":27268,
+  "title":"autoload vs eager load in docs clarify"
+ },
+ {
+  "body":"",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27267/comments",
+  "labels":[
+   {
+    "color":"8BE06E",
+    "default":false,
+    "id":107195,
+    "name":"railties",
+    "url":"https://api.github.com/repos/rails/rails/labels/railties"
+   }
+  ],
+  "number":27267,
+  "title":"Add fullstop following the pattern used in rest of the file"
+ },
+ {
+  "body":"",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27266/comments",
+  "labels":[],
+  "number":27266,
+  "title":"Fix binstop -> binstub typo in railties changelog."
+ },
+ {
+  "body":"Seeing as yarn already uses `sh` for their binstub (https://github.com/yarnpkg/yarn/blob/master/bin/yarn), we opt to use `sh` as well. The main reason for this being that boot times for some interpreters (i.e. jruby) are rather slow. This makes for a much better UX for these users.\r\n\r\nSee: https://github.com/rails/rails/pull/27245",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27265/comments",
+  "labels":[
+   {
+    "color":"8BE06E",
+    "default":false,
+    "id":107195,
+    "name":"railties",
+    "url":"https://api.github.com/repos/rails/rails/labels/railties"
+   }
+  ],
+  "number":27265,
+  "title":"Use sh instead of Ruby script for yarn binstub"
+ },
+ {
+  "body":"",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27264/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"fef2c0",
+    "default":false,
+    "id":309390193,
+    "name":"MySQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/MySQL"
+   }
+  ],
+  "number":27264,
+  "title":"Fix that `change_column` lose a comment"
+ },
+ {
+  "body":"Since 191facc857bb4fb52078fb544c6bc1613a81cc80 (particularly: https://github.com/rails/rails/commit/191facc857bb4fb52078fb544c6bc1613a81cc80#diff-eba6b59bacb9a1d88646145ed1ff4c86L34) the SQL runtime is not instrumented under the `INFO` log level. I guess this is a bug as I see no logical reason why this information is considered too verbose for the `INFO` log level. Indeed, this is still reported/emitted but as `0`.\r\n\r\nMoving that line back above the `logger.debug?` guard corrects the issue.\r\n\r\nI'm happy to submit a fix but wanted first to assess whether this was the expected behaviour.\r\n\r\n### Steps to reproduce\r\n\r\nhttps://gist.github.com/benlovell/3bd9093a6761d3b399517da517c8bdd8\r\n\r\n### Expected behavior\r\n\r\nThe SQL runtime counter should be instrumented in all log levels.\r\n\r\n### Actual behavior\r\n\r\nThe SQL runtime counter isn't instrumented correctly under the `INFO` log level.\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0.1\r\n\r\n**Ruby version**: 2.3.3\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27263/comments",
+  "labels":[],
+  "number":27263,
+  "title":"Correctly instrument SQL runtime in the `INFO` log level"
+ },
+ {
+  "body":"",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27262/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   }
+  ],
+  "number":27262,
+  "title":"ports #26235 to 5-0-stable"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nI just tried to log when controller callbacks are triggered and found a strange behaviour of all append_* callbacks, depending of the declaration order.\r\n\r\n### Expected behavior\r\nFor example, I want append_before_action to be triggered after before_action. Same logic for the two others. I need this to order my before_action callbacks, and I'm sad to see it's not possible to give a parameter to before_action like `order: 1` called by chronological order (regardless of the controller in which it is declared).\r\n\r\n### Actual behavior\r\nThe current state, from Rails 3, is an alias to before_action, around_action and after_action, unlike prepend_before_action, prepend_around_action and prepend_after_action that are real callbacks, as you can see is the source code : https://github.com/rails/rails/blob/v5.0.0.1/actionpack/lib/abstract_controller/callbacks.rb#L220\r\n\r\nIt's so counter-intuitive!\r\n\r\n### System configuration\r\n**Rails version**: 5\r\n\r\n**Ruby version**: 2\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27261/comments",
+  "labels":[],
+  "number":27261,
+  "title":"append_before_action append_around_action and append_after_action are just alias methods"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nI can not use `5.1.0.alpha` to start a rails server with options.\r\n\r\n### Expected behavior\r\nwork well.\r\n\r\n### Actual behavior\r\n\r\n<img width=\"1204\" alt=\"2016-12-03 11 11 00\" src=\"https://cloud.githubusercontent.com/assets/5362640/20860244/51e89972-b9ae-11e6-887e-ac57f22c26e8.png\">\r\n\r\n\r\n### System configuration\r\n**Rails version**: 5.1.0.alpha\r\n\r\n**Ruby version**: 2.3.3\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27260/comments",
+  "labels":[
+   {
+    "color":"006b75",
+    "default":false,
+    "id":41328116,
+    "name":"attached PR",
+    "url":"https://api.github.com/repos/rails/rails/labels/attached%20PR"
+   },
+   {
+    "color":"8BE06E",
+    "default":false,
+    "id":107195,
+    "name":"railties",
+    "url":"https://api.github.com/repos/rails/rails/labels/railties"
+   },
+   {
+    "color":"009800",
+    "default":false,
+    "id":126910270,
+    "name":"With reproduction steps",
+    "url":"https://api.github.com/repos/rails/rails/labels/With%20reproduction%20steps"
+   }
+  ],
+  "number":27260,
+  "title":"Rails 5.1.0.alpha can not start server with options"
+ },
+ {
+  "body":"I fixed it according to other test case.\r\n\r\nref. https://ruby-doc.org/core-2.3.3/Enumerable.html#method-i-sort_by",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27259/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27259,
+  "title":"Use #sort_by instead of #sort"
+ },
+ {
+  "body":"Follow up to 79a5ea9eadb4d43b62afacedc0706cbe88c54496",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27258/comments",
+  "labels":[],
+  "number":27258,
+  "title":"stop using removed `render :text`"
+ },
+ {
+  "body":"Its standard name is JavaScript, so I think that JavaScripts were better.\r\n\r\nThe following is an example.\r\n\r\n## Before\r\n\r\n```sh\r\n% rake stats\r\n+----------------------+--------+--------+---------+---------+-----+-------+\r\n| Name                 |  Lines |    LOC | Classes | Methods | M/C | LOC/M |\r\n+----------------------+--------+--------+---------+---------+-----+-------+\r\n| Controllers          |      5 |      3 |       1 |       0 |   0 |     0 |\r\n| Helpers              |      2 |      2 |       0 |       0 |   0 |     0 |\r\n| Jobs                 |      2 |      2 |       1 |       0 |   0 |     0 |\r\n| Models               |     16 |     13 |       3 |       1 |   0 |    11 |\r\n| Mailers              |      4 |      4 |       1 |       0 |   0 |     0 |\r\n| Channels             |     10 |      8 |       2 |       0 |   0 |     0 |\r\n| Javascripts          |     27 |      0 |       0 |       0 |   0 |     0 |\r\n| Libraries            |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Tasks                |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Controller tests     |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Helper tests         |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Model tests          |      7 |      3 |       1 |       0 |   0 |     0 |\r\n| Mailer tests         |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Integration tests    |      0 |      0 |       0 |       0 |   0 |     0 |\r\n+----------------------+--------+--------+---------+---------+-----+-------+\r\n| Total                |     73 |     35 |       9 |       1 |   0 |    33 |\r\n+----------------------+--------+--------+---------+---------+-----+-------+\r\n  Code LOC: 32     Test LOC: 3     Code to Test Ratio: 1:0.1\r\n```\r\n\r\n## After\r\n\r\n```sh\r\n% rake stats\r\n+----------------------+--------+--------+---------+---------+-----+-------+\r\n| Name                 |  Lines |    LOC | Classes | Methods | M/C | LOC/M |\r\n+----------------------+--------+--------+---------+---------+-----+-------+\r\n| Controllers          |      5 |      3 |       1 |       0 |   0 |     0 |\r\n| Helpers              |      2 |      2 |       0 |       0 |   0 |     0 |\r\n| Jobs                 |      2 |      2 |       1 |       0 |   0 |     0 |\r\n| Models               |     16 |     13 |       3 |       1 |   0 |    11 |\r\n| Mailers              |      4 |      4 |       1 |       0 |   0 |     0 |\r\n| Channels             |     10 |      8 |       2 |       0 |   0 |     0 |\r\n| JavaScripts          |     27 |      0 |       0 |       0 |   0 |     0 |\r\n| Libraries            |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Tasks                |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Controller tests     |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Helper tests         |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Model tests          |      7 |      3 |       1 |       0 |   0 |     0 |\r\n| Mailer tests         |      0 |      0 |       0 |       0 |   0 |     0 |\r\n| Integration tests    |      0 |      0 |       0 |       0 |   0 |     0 |\r\n+----------------------+--------+--------+---------+---------+-----+-------+\r\n| Total                |     73 |     35 |       9 |       1 |   0 |    33 |\r\n+----------------------+--------+--------+---------+---------+-----+-------+\r\n  Code LOC: 32     Test LOC: 3     Code to Test Ratio: 1:0.1\r\n```\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27257/comments",
+  "labels":[
+   {
+    "color":"8BE06E",
+    "default":false,
+    "id":107195,
+    "name":"railties",
+    "url":"https://api.github.com/repos/rails/rails/labels/railties"
+   }
+  ],
+  "number":27257,
+  "title":"Use JavaScripts instead of Javascripts in `rake stats`"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\n```\r\n> rails new test-project\r\n> rails g --help\r\n```\r\n\r\n### Expected behavior\r\nA useful help message without any errors or warnings\r\n\r\n### Actual behavior\r\nA useful help message, AND the following 3 warnings:\r\n```\r\nExpected string default value for '--jbuilder'; got true (boolean)\r\nExpected string default value for '--helper'; got true (boolean)\r\nExpected string default value for '--assets'; got true (boolean)\r\n```\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0.1\r\n**Ruby version**: 2.3.1 (mri)\r\nUbuntu 16.04\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27256/comments",
+  "labels":[],
+  "number":27256,
+  "title":"Strange warnings in default `rails g --help` output"
+ },
+ {
+  "body":"I have the below 2 models:\r\n\r\n```Ruby\r\nclass IfsDocument < ApplicationRecord\r\n\r\n  # Scopes\r\n  default_scope { order(position: :asc) }\r\n  has_many :ifs_document_versions\r\n  # ..\r\nend\r\n\r\nclass IfsDocumentVersion < ApplicationRecord\r\n  belongs_to :ifs_document\r\n\r\n  # Scopes\r\n  default_scope { order(created_at: :desc) }\r\nend\r\n```\r\n### Steps to reproduce\r\n\r\nThe below version doesn't work.\r\n\r\n```sh\r\n[11] pry(main)> a = IfsDocumentVersion.includes(:ifs_document).unscoped.order(\"ifs_documents.name\")\r\n  IfsDocumentVersion Load (0.7ms)  SELECT \"ifs_document_versions\".* FROM \"ifs_document_versions\" ORDER BY ifs_documents.name\r\n=> #<IfsDocumentVersion::ActiveRecord_Relation:0x2adb5edbe174>\r\n[12] pry(main)> a.length\r\n  IfsDocumentVersion Load (0.8ms)  SELECT \"ifs_document_versions\".* FROM \"ifs_document_versions\" ORDER BY ifs_documents.name\r\nActiveRecord::StatementInvalid: PG::UndefinedTable: ERROR:  missing FROM-clause entry for table \"ifs_documents\"\r\nLINE 1: ...versions\".* FROM \"ifs_document_versions\" ORDER BY ifs_docume...\r\n                                                             ^\r\n: SELECT \"ifs_document_versions\".* FROM \"ifs_document_versions\" ORDER BY ifs_documents.name\r\nfrom /home/deploy/app/releases/448/vendor/bundle/ruby/2.3.0/gems/activerecord-5.0.0/lib/active_record/connection_adapters/postgresql_adapter.rb:598:in `async_exec'\r\n```\r\n\r\nWhile the below works:\r\n\r\n```sh\r\n[13] pry(main)> a = IfsDocumentVersion.unscoped.includes(:ifs_document).order(\"ifs_documents.name\")\r\n  SQL (1.5ms)  SELECT \"ifs_document_versions\".\"id\" AS t0_r0, \"ifs_document_versions\".\"uuid\" AS t0_r1, \"ifs_document_versions\".\"ifs_document_id\" AS t0_r2, \"ifs_document_ve\r\nrsions\".\"ifs_doc_version\" AS t0_r3, \"ifs_document_versions\".\"is_public\" AS t0_r4, \"ifs_document_versions\".\"is_validatable\" AS t0_r5, \"ifs_document_versions\".\"is_validated\r\n\" AS t0_r6, \"ifs_document_versions\".\"validated_by\" AS t0_r7, \"ifs_document_versions\".\"validated_at\" AS t0_r8, \"ifs_document_versions\".\"is_expirable\" AS t0_r9, \"ifs_docume\r\nnt_versions\".\"is_expired\" AS t0_r10, \"ifs_document_versions\".\"expired_at\" AS t0_r11, \"ifs_document_versions\".\"state\" AS t0_r12, \"ifs_document_versions\".\"position\" AS t0_r\r\n13, \"ifs_document_versions\".\"properties\" AS t0_r14, \"ifs_document_versions\".\"created_at\" AS t0_r15, \"ifs_document_versions\".\"updated_at\" AS t0_r16, \"ifs_document_versions\r\n\".\"deleted_at\" AS t0_r17, \"public\".\"ifs_documents\".\"id\" AS t1_r0, \"public\".\"ifs_documents\".\"uuid\" AS t1_r1, \"public\".\"ifs_documents\".\"ifs_code\" AS t1_r2, \"public\".\"ifs_do\r\ncuments\".\"brc_code\" AS t1_r3, \"public\".\"ifs_documents\".\"name\" AS t1_r4, \"public\".\"ifs_documents\".\"description\" AS t1_r5, \"public\".\"ifs_documents\".\"state\" AS t1_r6, \"publi\r\nc\".\"ifs_documents\".\"position\" AS t1_r7, \"public\".\"ifs_documents\".\"properties\" AS t1_r8, \"public\".\"ifs_documents\".\"created_at\" AS t1_r9, \"public\".\"ifs_documents\".\"updated_\r\nat\" AS t1_r10, \"public\".\"ifs_documents\".\"deleted_at\" AS t1_r11, \"public\".\"ifs_documents\".\"category\" AS t1_r12, \"public\".\"ifs_documents\".\"is_public\" AS t1_r13, \"public\".\"i\r\nfs_documents\".\"is_validatable\" AS t1_r14, \"public\".\"ifs_documents\".\"is_expirable\" AS t1_r15 FROM \"ifs_document_versions\" LEFT OUTER JOIN \"public\".\"ifs_documents\" ON \"publ\r\nic\".\"ifs_documents\".\"id\" = \"ifs_document_versions\".\"ifs_document_id\" ORDER BY ifs_documents.name\r\n[14] pry(main)> a.length\r\n=> 7\r\n```\r\n\r\n### Expected behavior\r\n \r\n`.unscoped` should work with `.includes` while using `.order()`.\r\n\r\n### Actual behavior\r\n\r\nIn 1 case it is working, but in another case it is not working. Look the error above.\r\n\r\n### System configuration\r\n**Rails version**: Rails 5.0.0\r\n**Ruby version**: ruby 2.3.1p112 (2016-04-26 revision 54768) [x86_64-darwin15]\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27255/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27255,
+  "title":"includes and unscoped not working while having default scope in both models"
+ },
+ {
+  "body":"### Summary\r\n\r\n\r\nsince I've upgraded to rails 5, all deprecations are shown to be coming from inside the framework.\r\n\r\n\r\n### Other Information\r\n\r\nBefore: \r\n```\r\nDEPRECATION WARNING: alias_method_chain is deprecated. Please, use Module#prepend instead. From module, you can access the original method using super. (called from alias_method_chain at /home/mathieu/.rvm/gems/ruby-2.3.1/gems/activesupport-5.0.0.1/lib/active_support/core_ext/module/aliasing.rb:27)\r\nDEPRECATION WARNING: alias_method_chain is deprecated. Please, use Module#prepend instead. From module, you can access the original method using super. (called from alias_method_chain at /home/mathieu/.rvm/gems/ruby-2.3.1/gems/activesupport-5.0.0.1/lib/active_support/core_ext/module/aliasing.rb:27)\r\n```\r\n\r\nAfter\r\n```\r\nDEPRECATION WARNING: alias_method_chain is deprecated. Please, use Module#prepend instead. From module, you can access the original method using super. (called from <class:Ambiguous> at /home/mathieu/.rvm/gems/ruby-2.3.1/gems/cucumber_priority-0.1.2/lib/cucumber_priority/ambiguous_error_ext.rb:11)\r\nDEPRECATION WARNING: alias_method_chain is deprecated. Please, use Module#prepend instead. From module, you can access the original method using super. (called from <class:SupportCode> at /home/mathieu/.rvm/gems/ruby-2.3.1/gems/cucumber_priority-0.1.2/lib/cucumber_priority/support_code_ext.rb:29)\r\n\r\n```\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27254/comments",
+  "labels":[
+   {
+    "color":"FC9300",
+    "default":false,
+    "id":107194,
+    "name":"activesupport",
+    "url":"https://api.github.com/repos/rails/rails/labels/activesupport"
+   }
+  ],
+  "number":27254,
+  "title":"fix deprecation_caller_message to display right file:line"
+ },
+ {
+  "body":"Hello I am receiving error\r\n\r\n``` ../.rvm/gems/ruby-2.3.0/bundler/gems/activeadmin-a932d56b156e/lib/active_admin/devise.rb:31:in `block in <module:Controller>': undefined method `helper' for ActiveAdmin::Devise::SessionsController:Class (NoMethodError)```\r\n\r\n### Steps to reproduce\r\n\r\nOn a new rails 5 api, I added the following gems:\r\n\r\n> gem 'devise'\r\n> gem 'activeadmin', github: 'activeadmin'\r\n> gem 'inherited_resources', github: 'activeadmin/inherited_resources'\r\n\r\nI also added to `app/controllers/application_controller.rb`\r\n\r\n>include ActionView::Layouts\r\n\r\n### System configuration\r\nGem file:\r\n\r\n``` source 'https://rubygems.org'\r\n# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'\r\ngem 'rails', '~> 5.0.0', '>= 5.0.0.1'\r\n# Use sqlite3 as the database for Active Record\r\ngem 'sqlite3'\r\ngem 'pg'\r\n# Use Puma as the app server\r\ngem 'puma', '~> 3.0'\r\n\r\ngem 'devise'\r\ngem 'activeadmin', github: 'activeadmin'\r\ngem 'inherited_resources', github: 'activeadmin/inherited_resources'\r\n\r\n# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder\r\n# gem 'jbuilder', '~> 2.5'\r\n# Use Redis adapter to run Action Cable in production\r\n# gem 'redis', '~> 3.0'\r\n# Use ActiveModel has_secure_password\r\n# gem 'bcrypt', '~> 3.1.7'\r\n\r\n# Use Capistrano for deployment\r\n# gem 'capistrano-rails', group: :development\r\n\r\n# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible\r\n# gem 'rack-cors'\r\n\r\ngroup :development, :test do\r\n  # Call 'byebug' anywhere in the code to stop execution and get a debugger console\r\n  gem 'byebug', platform: :mri\r\nend\r\n\r\ngroup :development do\r\n  gem 'listen', '~> 3.0.5'\r\n  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring\r\n  gem 'spring'\r\n  gem 'spring-watcher-listen', '~> 2.0.0'\r\nend\r\n\r\n# Windows does not include zoneinfo files, so bundle the tzinfo-data gem\r\ngem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]\r\n```\r\n\r\n**Rails version**:\r\n`Rails 5.0.0.1`\r\n\r\n**Ruby version**:\r\n`ruby 2.3.0p0 (2015-12-25 revision 53290) [x86_64-darwin16]`\r\n**Full output**\r\n```\r\n$ rails g active_admin:install\r\nRunning via Spring preloader in process 33185\r\n      invoke  devise\r\n    generate    devise:install\r\n      create    config/initializers/devise.rb\r\n      create    config/locales/devise.en.yml\r\n  ===============================================================================\r\n\r\nSome setup you must do manually if you haven't yet:\r\n\r\n  1. Ensure you have defined default url options in your environments files. Here\r\n     is an example of default_url_options appropriate for a development environment\r\n     in config/environments/development.rb:\r\n\r\n       config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }\r\n\r\n     In production, :host should be set to the actual host of your application.\r\n\r\n  2. Ensure you have defined root_url to *something* in your config/routes.rb.\r\n     For example:\r\n\r\n       root to: \"home#index\"\r\n\r\n  3. Ensure you have flash messages in app/views/layouts/application.html.erb.\r\n     For example:\r\n\r\n       <p class=\"notice\"><%= notice %></p>\r\n       <p class=\"alert\"><%= alert %></p>\r\n\r\n  4. You can copy Devise views (for customization) to your app by running:\r\n\r\n       rails g devise:views\r\n\r\n===============================================================================\r\n      invoke    active_record\r\n      create      db/migrate/20161202173028_devise_create_admin_users.rb\r\n      create      app/models/admin_user.rb\r\n      invoke      test_unit\r\n      create        test/models/admin_user_test.rb\r\n      create        test/fixtures/admin_users.yml\r\n      insert      app/models/admin_user.rb\r\n       route    devise_for :admin_users\r\n        gsub    app/models/admin_user.rb\r\n        gsub    config/routes.rb\r\n      append    db/seeds.rb\r\n      create  config/initializers/active_admin.rb\r\n      create  app/admin\r\n      create  app/admin/dashboard.rb\r\n      create  app/admin/admin_user.rb\r\n      insert  config/routes.rb\r\n    generate  active_admin:assets\r\n/../../.rvm/gems/ruby-2.3.0/bundler/gems/activeadmin-a932d56b156e/lib/active_admin/devise.rb:31:in `block in <module:Controller>': undefined method `helper' for ActiveAdmin::Devise::SessionsController:Class (NoMethodError)\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/concern.rb:120:in `class_eval'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/concern.rb:120:in `append_features'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/bundler/gems/activeadmin-a932d56b156e/lib/active_admin/devise.rb:54:in `include'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/bundler/gems/activeadmin-a932d56b156e/lib/active_admin/devise.rb:54:in `<class:SessionsController>'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/bundler/gems/activeadmin-a932d56b156e/lib/active_admin/devise.rb:53:in `<module:Devise>'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/bundler/gems/activeadmin-a932d56b156e/lib/active_admin/devise.rb:6:in `<module:ActiveAdmin>'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/bundler/gems/activeadmin-a932d56b156e/lib/active_admin/devise.rb:5:in `<top (required)>'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:293:in `require'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:293:in `block in require'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:259:in `load_dependency'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:293:in `require'\r\n\tfrom /../../Working/Working Set/abq_cc_api/config/routes.rb:2:in `block in <top (required)>'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/route_set.rb:389:in `instance_exec'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/route_set.rb:389:in `eval_block'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/route_set.rb:371:in `draw'\r\n\tfrom /../../Working/Working Set/abq_cc_api/config/routes.rb:1:in `<top (required)>'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:287:in `load'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:287:in `block in load'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:259:in `load_dependency'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:287:in `load'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application/routes_reloader.rb:40:in `block in load_paths'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application/routes_reloader.rb:40:in `each'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application/routes_reloader.rb:40:in `load_paths'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application/routes_reloader.rb:16:in `reload!'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application/routes_reloader.rb:26:in `block in updater'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/file_update_checker.rb:77:in `execute'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application/routes_reloader.rb:27:in `updater'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application/routes_reloader.rb:7:in `execute_if_updated'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application/finisher.rb:119:in `block in <module:Finisher>'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/initializable.rb:30:in `instance_exec'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/initializable.rb:30:in `run'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/initializable.rb:55:in `block in run_initializers'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:228:in `block in tsort_each'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:350:in `block (2 levels) in each_strongly_connected_component'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:431:in `each_strongly_connected_component_from'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:349:in `block in each_strongly_connected_component'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:347:in `each'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:347:in `call'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:347:in `each_strongly_connected_component'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:226:in `tsort_each'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/tsort.rb:205:in `tsort_each'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/initializable.rb:54:in `run_initializers'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/railties-5.0.0.1/lib/rails/application.rb:352:in `initialize!'\r\n\tfrom /../../Working/Working Set/abq_cc_api/config/environment.rb:5:in `<top (required)>'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:293:in `require'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:293:in `block in require'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:259:in `load_dependency'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb:293:in `require'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/spring-2.0.0/lib/spring/application.rb:92:in `preload'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/spring-2.0.0/lib/spring/application.rb:143:in `serve'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/spring-2.0.0/lib/spring/application.rb:131:in `block in run'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/spring-2.0.0/lib/spring/application.rb:125:in `loop'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/spring-2.0.0/lib/spring/application.rb:125:in `run'\r\n\tfrom /../../.rvm/gems/ruby-2.3.0/gems/spring-2.0.0/lib/spring/application/boot.rb:19:in `<top (required)>'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/rubygems/core_ext/kernel_require.rb:55:in `require'\r\n\tfrom /../../.rvm/rubies/ruby-2.3.0/lib/ruby/2.3.0/rubygems/core_ext/kernel_require.rb:55:in `require'\r\n\tfrom -e:1:in `<main>'\r\n      create  db/migrate/20161202173032_create_active_admin_comments.rb```",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27253/comments",
+  "labels":[],
+  "number":27253,
+  "title":"undefined 'method' helper for ActiveAdmin::Devise::SessionsController:Class"
+ },
+ {
+  "body":"Hello rails contributers ! Do you plan to create method for views context like ```render_relative``` ?\r\nThere are a lot of apps where I have a nested structure of views, for example\r\n```\r\nuser/aggregates/news/partial_1.html\r\nuser/aggregates/news/partial_2.html\r\nuser/aggregates/news/list.html\r\n\r\nuser/aggregates/posts/partial_3.html\r\nuser/aggregates/posts/partial_4.html\r\nuser/aggregates/posts/list.html\r\n```\r\nIt will be excellent if we can use relative path in any partial for render another partial, not absolute path... What you think about this idea ?\r\n\r\nWith best regards, Ruslan\r\n\r\n  ",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27252/comments",
+  "labels":[],
+  "number":27252,
+  "title":"Why there is no render_relative method?"
+ },
+ {
+  "body":"This pull request fixes has many scope in autosave after_save callbacks.\r\nThis problem is also present in 4.2.x.\r\n\r\n```ruby\r\nclass Post < ActiveRecord::Base\r\n  has_many :comments, inverse_of: :post\r\nend\r\n\r\nclass Comment < ActiveRecord::Base\r\n  belongs_to :post\r\n\r\n  after_save do\r\n    puts post.comments.count #=> expected 1, got: 0\r\n    puts post.comments.reload.count #=> expected: 1, got: 1\r\n  end\r\nend\r\n\r\npost = Post.new\r\npost.comments.build\r\npost.save!\r\n```",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27251/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27251,
+  "title":"Fix association scope inside autosaved association callbacks"
+ },
+ {
+  "body":"Follow up to 3dac36bd8e26363bb10f4d2a7b21efa75d200e26",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27250/comments",
+  "labels":[
+   {
+    "color":"8BE06E",
+    "default":false,
+    "id":107195,
+    "name":"railties",
+    "url":"https://api.github.com/repos/rails/rails/labels/railties"
+   }
+  ],
+  "number":27250,
+  "title":"use yarn binstub in `bin/update`"
+ },
+ {
+  "body":"fix bug in method `limited_ids_for`, presented with group by.\r\nI hope test is obvious. If not, please let me know, I will try to explain.\r\nNot sure this is the best solution. MIN() is not exactly what we want, but in general case it should work.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27249/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27249,
+  "title":"Limited ids for with group by"
+ },
+ {
+  "body":"### Summary\r\n\r\nIn SQL a `DELETE` statement is always idempotent (will always succeed even if the underlying table is only modified once). Consequently the `after_commit` callbacks on `:destroy`will be invoked multiple times for a given model, even if a single deletion occurred. This means that user handlers must also be idempotent, which is not always the case (for example, if counting resources).\r\n\r\nThe issue addressed in this PR is related to https://github.com/rails/rails/pull/14735 and is fixed in a similar fashion:\r\n\r\n- Introduce an optional `:idempotent` flag for the `after_commit` callback.\r\n- Default to `true` to preserve existing behaviour.\r\n- Cache whether the operation affected any rows and provide an `actually_destroyed?` getter.\r\n- Demonstrate problem and solution with new unit tests.\r\n\r\nWe (Shopify) have been running a monkey patched version of this PR since October in production with no ill-effects.\r\n\r\nr: @byroot @sgrif\r\ncc: @tenderlove\r\n\r\nP.S. This is my first Rails PR, so if there are any silly issues or violated conventions please let me know and I will resolve them as soon as possible. Thank you!\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27248/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27248,
+  "title":"Idempotent option for after_commit :destroy callback"
+ },
+ {
+  "body":"Updates the version of the `mail` gem shipped with actionmailer to be\r\nin the 2.6.x release in order to mitigate SMTP injection outlined in the\r\n[MBSD whitepaper](http://www.mbsd.jp/Whitepaper/smtpi.pdf).",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27247/comments",
+  "labels":[],
+  "number":27247,
+  "title":"Update minimum version of `mail` gem to 2.6.0"
+ },
+ {
+  "body":"Creating a new Rails 5 application with a model that has a PostgreSQL money typed field will fail to save records if said field is set as a Ruby Float. Note:\r\n\r\n1. Setting the money field as an `Fixnum` (e.g. `12`), `String` (e.g. `\"12.25\"`), or `String` with a dollar sign (e.g. `\"$12.25\"`) works as expected. No error is thrown, and the field when read back from PostgreSQL is properly typed in Rails as a `BigDecimal`.\r\n2. Setting the money field as a `Float` (e.g. `12.25`), fails in Rails 5.0.0.1 (see below for example output and test file), and passes in Rails 4.2.7.1\r\n\r\n### Steps to reproduce\r\n\r\nTest file here: https://gist.github.com/wiegand/b481bdb9e6dc992048c127baf60cf0b5\r\n\r\n(**Note**: you will need to update the PostgreSQL connection string on line 22 with an appropriate value for your system.)\r\n\r\n### Expected behavior\r\nSetting and persisting a money-typed field as a float should properly convert and store the value as the appropriate money value in PostgreSQL.\r\n\r\n### Actual behavior\r\nThe following error is thrown:\r\n\r\n```\r\nBugTest#test_price_as_float:\r\nActiveRecord::StatementInvalid: PG::InvalidTextRepresentation: ERROR:  invalid input syntax for type money: \"1.4000000000000000E+01\"\r\n: INSERT INTO \"items\" (\"price\") VALUES ($1) RETURNING \"id\"\r\n```\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0.1\r\n\r\n**Ruby version**: ruby 2.3.2p217 (2016-11-15 revision 56796) [x86_64-darwin16]\r\n\r\n**PostgreSQL version**: 9.6.1\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27246/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"fbca04",
+    "default":false,
+    "id":70310659,
+    "name":"PostgreSQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/PostgreSQL"
+   }
+  ],
+  "number":27246,
+  "title":"Saving an ActiveRecord model with a PostgreSQL money field set with a Ruby Float throws a PostgreSQL syntax error in Rails 5"
+ },
+ {
+  "body":"And then provide a binstub for yarn that runs in that directory.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27245/comments",
+  "labels":[],
+  "number":27245,
+  "title":"Yarn: Move node_modules, package.json, and yarn.lock file to vendor"
+ },
+ {
+  "body":"### Summary\r\n\r\nAdds support for config.action_cable.channel_prefix for #27224\r\n\r\nTODO:\r\n\r\n- [ ] Tests (Suite passes, but need to test this change).\r\n- [ ] Default to app_name:env in new_framework_defaults?\r\n- [ ] Documentation\r\n- [ ] ??? I'm sure there's more...\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27244/comments",
+  "labels":[
+   {
+    "color":"bfdadc",
+    "default":false,
+    "id":300028327,
+    "name":"actioncable",
+    "url":"https://api.github.com/repos/rails/rails/labels/actioncable"
+   },
+   {
+    "color":"ededed",
+    "default":false,
+    "id":128692,
+    "name":"needs feedback",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20feedback"
+   }
+  ],
+  "number":27244,
+  "title":"WIP: Support channel_prefix configuration for ActionCable."
+ },
+ {
+  "body":"With rails 5.0.1.rc1, I'm seeing failures to create indexes in MySQL with `length` options specified.  It looks like the `length` options are being ignored.\r\n\r\n### Steps to reproduce\r\n\r\n- Executable reproduction script: https://gist.github.com/seanwalbran/03939f95c9dd2ba2c02fadc99698fe52#file-active_record_gem-rb\r\n- Log of failure under 5.0.1.rc1: https://gist.github.com/seanwalbran/03939f95c9dd2ba2c02fadc99698fe52#file-5-0-1-rc1-log\r\n- Log of success under 5.0.0.1: https://gist.github.com/seanwalbran/03939f95c9dd2ba2c02fadc99698fe52#file-5-0-0-1-log\r\n\r\n[Line that breaks](https://gist.github.com/seanwalbran/03939f95c9dd2ba2c02fadc99698fe52#file-active_record_gem-rb-L30): ```t.index [\"user_id\", \"uri\"], name: \"index_posts_on_user_id_and_uri\", length: {\"user_id\"=>nil, \"uri\"=>255}, using: :btree```\r\n\r\nError message: ```Mysql2::Error: Specified key was too long; max key length is 767 bytes: CREATE TABLE `posts` (`id` int AUTO_INCREMENT PRIMARY KEY, `user_id` int NOT NULL, `uri` varchar(4096) NOT NULL,  INDEX `index_posts_on_user_id_and_uri` USING btree (`user_id`, `uri`)) ENGINE=InnoDB (ActiveRecord::StatementInvalid)```\r\n\r\n### Expected behavior\r\n\r\nIndex `length` options should be applied when the index is created\r\n\r\n### Actual behavior\r\n\r\nIndex `length` options are ignored, resulting in the failure to create the index if underlying length limits are exceeded.  Note in particular that the create table USING clause differs as follows:\r\n- 5.0.1.rc1 (failure): USING btree (`user_id`, `uri`))\r\n- 5.0.0.1 (success): USING btree (`user_id`, `uri`(255)))\r\n\r\n### System configuration\r\n**Rails version**: 5.0.1.rc1\r\n\r\n**Ruby version**: 2.3.1\r\n\r\n**Database**: mysql 5.6.22",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27243/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"006b75",
+    "default":false,
+    "id":41328116,
+    "name":"attached PR",
+    "url":"https://api.github.com/repos/rails/rails/labels/attached%20PR"
+   },
+   {
+    "color":"fef2c0",
+    "default":false,
+    "id":309390193,
+    "name":"MySQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/MySQL"
+   },
+   {
+    "color":"e10c02",
+    "default":false,
+    "id":107186,
+    "name":"regression",
+    "url":"https://api.github.com/repos/rails/rails/labels/regression"
+   },
+   {
+    "color":"009800",
+    "default":false,
+    "id":126910270,
+    "name":"With reproduction steps",
+    "url":"https://api.github.com/repos/rails/rails/labels/With%20reproduction%20steps"
+   }
+  ],
+  "number":27243,
+  "title":"database index creation with length options failing in 5.0.1.rc1"
+ },
+ {
+  "body":"### Summary\r\n\r\nWhen using a version of SQLite3 that does not support multi-insert statements, we build a string containing multiple statements. This string is then passed to `SQLite3::Database.execute()` but `.execute()` will only execute the first statement in a string and return any necessary results.\r\n\r\nThis change introduces a new method which uses `SQLite3::Database.execute_batch()` to execute all of the statements in the string. The caveat with `SQLite3::Database.execute_batch()` is that it cannot return a result set and instead returns nil. See http://www.rubydoc.info/gems/sqlite3/1.3.12/SQLite3%2FDatabase%3Aexecute_batch.\r\n\r\nThis new method is used to insert multiple versions into the `schema_migrations` table when migrations have been executed successfully, but only when normal multi-insert statements aren't supported by the SQLite3 version installed on the system.\r\n\r\nFixes #26948.\r\n\r\n### Other Information\r\nN/A",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27242/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27242,
+  "title":"Introduce `...SQLite3Adapter.execute_batch()` method"
+ },
+ {
+  "body":"```\r\n1. \r\ncookies[:name] = {\r\n    :value => locale.to_s,\r\n    :expires => 1.hour.from_now,\r\n    :path => '/',\r\n    :secure => true\r\n    }\r\n```\r\nand \r\n```\r\n2. cookies[:name] = locale.to_s\r\n```\r\nbecause I try read ``cookies[:name]`` not consistent for option 1",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27241/comments",
+  "labels":[],
+  "number":27241,
+  "title":"What difference it?"
+ },
+ {
+  "body":"### Summary\r\n\r\n[Problematic file](https://github.com/rails/rails/blob/00797f14a4882942560c8a0945ab5c2f085c4625/activerecord/CHANGELOG.md).\r\n\r\nI took a quick look at open issues/pull requests but no fix in sight.\r\n\r\n### Other Information\r\n\r\nThe alternative is escaping it but moving around the text seems a bit simpler.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27240/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27240,
+  "title":"Prevent issue number in documentation from becoming markdown header [ci skip]"
+ },
+ {
+  "body":"### Summary\r\n\r\nAdds the exception backtrace to the TaggedLogging formatter, similar to what the base formatter class does. In addition, when a non `String` or `Exception` is handled, the formatter now outputs `msg.inspect`.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27239/comments",
+  "labels":[
+   {
+    "color":"FC9300",
+    "default":false,
+    "id":107194,
+    "name":"activesupport",
+    "url":"https://api.github.com/repos/rails/rails/labels/activesupport"
+   }
+  ],
+  "number":27239,
+  "title":"Logs exception backtrace in `ActiveSupport::TaggedLogging`"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nStarting from Ruby 2.3.0, `Object.each_space` also [returns singleton classes](https://bugs.ruby-lang.org/issues/11360).\r\n\r\nThat breaks behavior of `Class.descendants` and `Class.subclasses` that also start to return singleton classes of their arguments.\r\n\r\n```\r\nbegin\r\n  require \"bundler/inline\"\r\nrescue LoadError => e\r\n  $stderr.puts \"Bundler version 1.10 or later is required. Please update your Bundler\"\r\n  raise e\r\nend\r\n\r\ngemfile(true) do\r\n  source \"https://rubygems.org\"\r\n  # Activate the gem you are reporting the issue against.\r\n  gem \"activesupport\", \"5.0.0\"\r\nend\r\n\r\nrequire \"active_support/core_ext/object/blank\"\r\nrequire \"minitest/autorun\"\r\n\r\n# Ensure backward compatibility with Minitest 4\r\nMinitest::Test = MiniTest::Unit::TestCase unless defined?(Minitest::Test)\r\n\r\nrequire \"active_support/core_ext/class/subclasses\"\r\nPants = Class.new\r\n\r\nclass BugTest < Minitest::Test\r\n  def test_stuff\r\n    Pants.new.singleton_class\r\n\r\n    assert_equal Pants.descendants, []\r\n  end\r\nend\r\n\r\n```\r\n\r\n### Expected behavior\r\n\r\n`Class.descendants` and `Class.subclasses` should not return singleton classes (test should pass).\r\n\r\n### Actual behavior\r\n\r\n```Fetching gem metadata from https://rubygems.org/..............\r\nFetching version metadata from https://rubygems.org/.\r\nResolving dependencies...\r\nUsing concurrent-ruby 1.0.2\r\nUsing minitest 5.9.1\r\nUsing i18n 0.7.0\r\nUsing bundler 1.13.6\r\nUsing thread_safe 0.3.5\r\nUsing tzinfo 1.2.2\r\nUsing activesupport 5.0.0 (was 4.2.7.1)\r\nRun options: --seed 39273\r\n\r\n# Running:\r\n\r\nF\r\n\r\nFinished in 0.011394s, 87.7655 runs/s, 87.7655 assertions/s.\r\n\r\n  1) Failure:\r\nBugTest#test_stuff [as_test.rb:28]:\r\nExpected: [#<Class:#<Pants:0x007f90c4036310>>]\r\n  Actual: []\r\n\r\n1 runs, 1 assertions, 1 failures, 0 errors, 0 skips\r\n```\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0\r\n\r\n**Ruby version**: 2.3.3\r\n\r\n**OS**: macOS Sierra 10.12.1",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27238/comments",
+  "labels":[
+   {
+    "color":"FC9300",
+    "default":false,
+    "id":107194,
+    "name":"activesupport",
+    "url":"https://api.github.com/repos/rails/rails/labels/activesupport"
+   },
+   {
+    "color":"009800",
+    "default":false,
+    "id":126910270,
+    "name":"With reproduction steps",
+    "url":"https://api.github.com/repos/rails/rails/labels/With%20reproduction%20steps"
+   }
+  ],
+  "number":27238,
+  "title":"Class.descendants returns singleton classes starting from Ruby 2.3.0"
+ },
+ {
+  "body":"Backport of #25506 to 5-0-0.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27237/comments",
+  "labels":[],
+  "number":27237,
+  "title":"return correct type from `EnumType`"
+ },
+ {
+  "body":"### Steps to reproduce\r\nUsing PostgreSQL, create a table with a jsonb field, and a corresponding ActiveRecord model, for this example the field will be called `foo` and the model `Bar`.\r\n\r\nThen using the rails console:\r\n```\r\nb = Bar.new\r\nb.foo = \"test string\"\r\nb.foo\r\n```\r\n\r\n### Expected behavior\r\n`b.foo` returns `\"test string\"`\r\n\r\n### Actual behavior\r\n`b.foo` returns `nil`\r\n\r\n### System configuration\r\n**Rails version**: 4.2.6\r\n\r\n**Ruby version**: 2.2.5\r\n\r\n### Additional notes\r\n\r\nI believe this is happening because of this line, which only encodes Hashes and Arrays: https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/connection_adapters/postgresql/oid/json.rb#L21\r\n\r\nIt also seems this behavior was changed in Rails 5, and is likely no longer an issue there:\r\nhttps://github.com/rails/rails/blob/5-0-1/activerecord/lib/active_record/type/internal/abstract_json.rb\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27236/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"fbca04",
+    "default":false,
+    "id":70310659,
+    "name":"PostgreSQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/PostgreSQL"
+   }
+  ],
+  "number":27236,
+  "title":"ActiveRecord coerces String values to nil for jsonb fields"
+ },
+ {
+  "body":"### Summary\r\n\r\nFowardporting changes to `tasks/release.rb` that were made as part of the 5.0.1.rc1 release cycle.\r\n\r\nr? @matthewd ",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27235/comments",
+  "labels":[],
+  "number":27235,
+  "title":"Fowardport changes to tasks/release.rb"
+ },
+ {
+  "body":"Backport #26972 and #26981.\r\n\r\nOur Rails app encountered lots of slow queries due to except `:order`.\r\nCurrently I'm using `relation.load.size` instead as a workaround to keep `:order`.\r\n\r\nI'd like to backport these fixes to latest stable branch.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27234/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27234,
+  "title":"5-0-stable: Avoid `unscope(:order)` when `limit_value` is presented for `count`and `exists?`"
+ },
+ {
+  "body":"Remove outdated tip regarding second argument of `options_for_select` from form_helpers guid.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27233/comments",
+  "labels":[
+   {
+    "color":"d7e102",
+    "default":false,
+    "id":3666649,
+    "name":"actionview",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionview"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27233,
+  "title":"Fixes #27202, [ci skip]"
+ },
+ {
+  "body":"Hi,\r\n\r\nThis is a tiny pull request that addresses the ticket in Basecamp regarding simplifying linking to GitHub or the API site in GitHub.\r\n\r\nUsing `grep` inside the guide folder, it looks like:\r\n\r\n* Most GitHub links are either for release notes or to refer to the code file inside the \"Active Support Core Extensions\" guide.\r\n* The `api://` scheme can definitely improve the guides. At the moment, links are barely going to the current version's site so they may become broken in the future or a feature may be documented while it's only available in newer versions.\r\n\r\nSo this pull request addresses the following things:\r\n\r\n* It is possible to link to a file hosted on GitHub like this for instance:\r\n  * `github://5-1-stable/activesupport/CHANGELOG.md` will become \"https://github.com/rails/rails/tree/5-1-stable/activesupport/CHANGELOG.md\".\r\n  * `github://github://abstract_controller/caching.rb` will become \"https://github.com/rails/rails/tree/master/actionpack/lib/abstract_controller/caching.rb\" (and the `master` part is automatically changed if the `RAILS_VERSION` environment variable is defined).\r\n* Every note that have \"Defined in `path/to/file.rb`\" are now automatically expanded with a link.\r\n* It is possible to link to the API site like this for instance:\r\n  * For instance methods, `api://ActionDispatch::Http::Cache::Request#etag_matches?` will become \"http://edgeapi.rubyonrails.org/classes/ActionDispatch/Http/Cache/Request.html#method-i-etag_matches-3F\" (`?` and `!` are properly URI-encoded for anchors and the `edgeapi` part changes to `api` with the proper version in the URL if the `RAILS_VERSION` environment variable is defined).\r\n  * For class methods, `api://ActionController::Renderer.new` will become \"http://edgeapi.rubyonrails.org/classes/ActionController/Renderer.html#method-c-new\".\r\n\r\nThere's already an opened pull request to address the automatic linking of notes inside the core extensions guide. The author has been properly credited inside the commit but here's the PR for reference: https://github.com/rails/rails/pull/20036.\r\n\r\nLet met know if there's anything that isn't addressed or wrong here!\r\n\r\nHave a nice day ! :-)",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27232/comments",
+  "labels":[
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27232,
+  "title":"Simplify linking to GitHub or the API site in the guides"
+ },
+ {
+  "body":"Though I understand, and agree with, the rationale behind the removal of the dynamic `:action` segment in https://github.com/rails/rails/pull/23980, the suggested workaround to whitelist each individual action is leading to application memory bloat.\r\n\r\nWith a simple rails runner:\r\n\r\n|         | Memory         | Time         | `rails routes` entries |\r\n|---------|----------------|--------------|---------------|\r\n| Before   | 166_028_629 MB | 6.142s       | 656           |\r\n| After  | 187_430_229 MB | 6.838s       | 3798          |\r\n| Change | ~21 MB (+12.9%) | 0.7s (+11.3%) | 3142 (+479.0%)  |\r\n\r\nIf you want to see the workaround source, you can see it at https://github.com/ManageIQ/manageiq/pull/12895/commits/0f6fee967d71b5f41cfad011d6ada4b058b9517b  (In all fairness, the diff is backwards to the numbers above...we originally had one-route-per-whitelist-entry and are trying to move *towards* the dynamic `:action` with a Regexp whitelist in order to decrease our process memory.  It wasn't until I wrote the change to use the dynamic `:action` that I ran into this deprecation.)\r\n\r\n---\r\n\r\n### Memory analysis\r\n\r\nUsing the allocation tracer from [this gist](https://gist.github.com/jrafanie/9e1d3caeb29339f696b8b6f4eca9efda) (Thanks @jrafanie!), you can see that the majority of our boot time retained allocations are in action_dispatch/routing and action_dispatch/journey with a bonus ~53k strings from somewhere else (NOTE: These are the top 10 entries, but note that there are many more journey and routing lines after these)\r\n\r\nBefore (dynamic `:action`)\r\n\r\n```\r\nm:   4,001,968 | c:  34,507 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/mapper.rb\r\nm:   2,795,971 | c:  40,516 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb\r\nm:   1,590,197 | c:  19,996 | String\r\nm:   1,050,224 | c:       1 | Thread\r\nm:   1,031,028 | c:  13,000 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/mime-types-2.6.2/lib/mime/type.rb\r\nm:     878,323 | c:   9,916 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/journey/scanner.rb\r\nm:     795,753 | c:   1,373 | Regexp\t/Users/jfrey/.gem/ruby/2.3.3/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb\r\nm:     783,666 | c:   8,546 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/activesupport-5.0.0.1/lib/active_support/file_update_checker.rb\r\nm:     724,594 | c:   6,196 | String\t/Users/jfrey/.rubies/ruby-2.3.3/lib/ruby/2.3.0/racc/parser.rb\r\nm:     716,112 | c:   3,642 | Hash\t/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/mapper.rb\r\n```\r\n\r\nAfter (one-route-per-whitelist-entry)\r\n\r\n```\r\nm:   5,488,795 | c:  53,801 | String\r\nm:   2,945,515 | c:  28,409 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/mapper.rb\r\nm:   2,128,864 | c:  12,364 | Hash\t/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/routing/mapper.rb\r\nm:   2,116,517 | c:  34,803 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/activesupport-5.0.0.1/lib/active_support/dependencies.rb\r\nm:   1,633,744 | c:  36,181 | Array\t/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/journey/visitors.rb\r\nm:   1,312,363 | c:  24,171 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/journey/scanner.rb\r\nm:   1,144,800 | c:   4,610 | Hash\r\nm:   1,104,080 | c:  27,602 | ActionDispatch::Journey::Nodes::Cat\t/Users/jfrey/.gem/ruby/2.3.3/gems/actionpack-5.0.0.1/lib/action_dispatch/journey/parser.rb\r\nm:   1,050,224 | c:       1 | Thread\r\nm:   1,031,028 | c:  13,000 | String\t/Users/jfrey/.gem/ruby/2.3.3/gems/mime-types-2.6.2/lib/mime/type.rb\r\n```\r\n\r\n---\r\n\r\nI think there are three ways forward with this, so I was hoping to discuss that here.\r\n\r\n1. Instead of deprecating the `:action` segment entirely, only deprecate it if there isn't a qualifier (in our case, we have a Regex whitelist).  If a Regex isn't acceptable, perhaps create a specific \"whitelist\" constraint on the `:action` segment, and don't allow dynamic `:actions` without the whitelist constraint.\r\n2. Figure out how we can reduce the memory overhead of the routing.  Additionally, we pay the penalty of setting up the routes even when we don't need them in console or runner, so perhaps we can dynamically resolve them when needed?\r\n3. Just accept that my process will be ~10% heavier (please don't pick this one :smile: )\r\n\r\ncc @pixeltrix @tenderlove @matthewd \r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27231/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   },
+   {
+    "color":"ededed",
+    "default":false,
+    "id":128692,
+    "name":"needs feedback",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20feedback"
+   },
+   {
+    "color":"e102d8",
+    "default":false,
+    "id":35206628,
+    "name":"routing",
+    "url":"https://api.github.com/repos/rails/rails/labels/routing"
+   }
+  ],
+  "number":27231,
+  "title":"Dynamic :action segment deprecation forces application bloat after suggested workaround"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\n1. Generate a brand new application `rails new some_awesome_app`\r\n2. Generate a model `rails generate model post title:string body:text`\r\n3. Tweak the post_test to look like this:\r\n\r\n```ruby\r\nrequire 'test_helper'\r\n\r\nclass PostTest < ActiveSupport::TestCase\r\n  test \"the truth\" do\r\n    posts(:one)\r\n    puts inspect\r\n    some_variable_not_set\r\n  end\r\nend\r\n```\r\n\r\n4. Run the tests `rake test`\r\n\r\n### Expected behavior\r\nThe test to fail in a reasonable time.\r\n\r\n### Actual behavior\r\nThe tests fail in a reasonable time for small codebases, but for codebases with tons of models and fixtures, there's a noticeable delay per each test with a NameError (~10 seconds in our production app).\r\n\r\nFor some reason it boils down to test failures calling inspect on the test itself which generates the output for all the instance variables with `@fixture_cache`, `@fixture_connections`, and `@loaded_fixtures` being the main culprits. For our production application, the output of a single test running `puts inspect` generates a 54MB file.\r\n\r\nWe can monkey patch `ActiveSupport::TestCase` to avoid this, but that doesn't seem like the right approach to this. Overriding the `inspect` method on `ActiveSupport::TestCase` or the `inspect` methods on those variables will reclaim the performance hit. But there may be a better/smarter way to fix this.\r\n\r\n### System configuration\r\n**Rails version**: 4.0. 4.1, 4.2, 5.0\r\n\r\n**Ruby version**: All\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27230/comments",
+  "labels":[],
+  "number":27230,
+  "title":"NameErrors in tests for large applications have a noticeable performance penalty"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nrails g   #Pretty much any rails g commands show this error\r\n\r\n### Expected behavior\r\nI expect no error\r\n\r\n### Actual behavior\r\nthe following message appears ==> Expected string default value for '--jbuilder'; got true (boolean)\r\n\r\nOtherwise everything seems to function properly\r\n\r\n### System configuration\r\n**Rails version**: 4.2.7.1 (and others)\r\n\r\n**Ruby version**: 2.2.5 (and others)\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27229/comments",
+  "labels":[
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":131864,
+    "name":"third party issue",
+    "url":"https://api.github.com/repos/rails/rails/labels/third%20party%20issue"
+   }
+  ],
+  "number":27229,
+  "title":"Expected string default value for '--jbuilder'; got true (boolean)"
+ },
+ {
+  "body":"Follow up to f39779fb8e40bf88ea842116e4bddcd7280a9a94.\r\n\r\nCI failure is due to missing `Regexp#match?` in 5-0-stable.\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27228/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27228,
+  "title":"Fix CI failure due to missing `Regexp#match?`"
+ },
+ {
+  "body":"### Summary\r\n\r\nAllow to custom `content-type` in case of setting `headers[:body]` and `attachments`\r\n\r\n```\r\nattachments[:rails] = xxx\r\nmail(\r\n  body: \"<html><body>Hello rails</body></html>\",\r\n  content_type: \"text/html\"\r\n)\r\n# => content_type is now text/hml\r\n```",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27227/comments",
+  "labels":[
+   {
+    "color":"8B00FC",
+    "default":false,
+    "id":107188,
+    "name":"actionmailer",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionmailer"
+   },
+   {
+    "color":"000000",
+    "default":false,
+    "id":257468118,
+    "name":"needs work",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20work"
+   }
+  ],
+  "number":27227,
+  "title":"Allow to custom content type when setting mailer body"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nTry clicking on the **\"Learn More\"** link directly below the code block with the text:-\r\n```\r\nclass Product < ActiveRecord::Base\r\nend\r\n```\r\n\r\n(Guidelines for creating a bug report are [available\r\nhere](http://guides.rubyonrails.org/contributing_to_ruby_on_rails.html#creating-a-bug-report))\r\n\r\n### Expected behavior\r\nLink should redirect to a new page\r\n\r\n### Actual behavior\r\n404 error\r\n\r\n### System configuration\r\nNA\r\n\r\n**Ruby version**:\r\nNA",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27226/comments",
+  "labels":[],
+  "number":27226,
+  "title":"Broken Link on ActiveRecord readme - https://github.com/rails/rails/blob/master/activerecord/README.rdoc"
+ },
+ {
+  "body":"`Gem.win_platform?` check if it is Windows more accurately.\r\nRef: https://github.com/ruby/ruby/blob/ruby_2_2/lib/rubygems.rb#L945..L952",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27225/comments",
+  "labels":[],
+  "number":27225,
+  "title":"use `Gem.win_platform?` to check windows Ruby platforms"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\n1. create two rails app with a basic chat\r\n2. Setup ChatChannel for both app with `stream_from \"chat_channel\"`\r\n3. Run both app and two differents actioncable server (using redis)\r\n4. send a message from app 1\r\n\r\n### Expected behavior\r\n\r\nThe message is saved in app 1 and broadcasted to **app 1** websocket\r\n\r\n### Actual behavior\r\n\r\nThe message is saved in app 1 and broadcasted to **both app** websocket\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27224/comments",
+  "labels":[
+   {
+    "color":"bfdadc",
+    "default":false,
+    "id":300028327,
+    "name":"actioncable",
+    "url":"https://api.github.com/repos/rails/rails/labels/actioncable"
+   },
+   {
+    "color":"006b75",
+    "default":false,
+    "id":41328116,
+    "name":"attached PR",
+    "url":"https://api.github.com/repos/rails/rails/labels/attached%20PR"
+   }
+  ],
+  "number":27224,
+  "title":"Scope channel if multiple actioncable server using redis"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\narticles = []\r\narticle_ids.each do |article_id|\r\n  articles << Article.find_by!(id: article_id)\r\nend\r\n\r\n### Expected behavior\r\narticles = Article.find_batch_by!(id: article_ids)\r\n\r\n### Actual behavior\r\nThere's no such method.\r\n\r\n### System configuration\r\n**Rails version**:\r\n5.x\r\n**Ruby version**:\r\n2.3.x",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27223/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27223,
+  "title":"Find by an array of values"
+ },
+ {
+  "body":"hi guys\r\n\r\nHow search in hash column ?\r\n```\r\n## product model\r\n serialize :properties, Hash\r\n\r\n##product migration\r\n    add_column :products, :properties, :text\r\n```\r\n\r\n## search query\r\nProduct.where('properties[foo] = bar')",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27222/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27222,
+  "title":"search in hash"
+ },
+ {
+  "body":"### Summary\r\n\r\nWas trying to answer a question on stackoverflow and looking into the logic of how folders end up in the `autoloadpath`. Trying to understand the logic it looked to me that `@current` is used nowhere in `Root` itself and most likely a reminiscent from a refactoring.\r\n\r\nUnit-Tests are still \ud83c\udf4f \r\n\r\n```\r\n |2.3.0| workify in ~/Documents/rails/rails/railties\r\n\u00b1 |current_is_not_used \u2713| \u2192 ruby -I\"lib:test\" test/paths_test.rb\r\nRun options: --seed 61508\r\n\r\n# Running:\r\n\r\n....................................\r\n\r\nFinished in 0.004794s, 7508.9356 runs/s, 13766.3820 assertions/s.\r\n\r\n36 runs, 66 assertions, 0 failures, 0 errors, 0 skips\r\n```\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27221/comments",
+  "labels":[
+   {
+    "color":"8BE06E",
+    "default":false,
+    "id":107195,
+    "name":"railties",
+    "url":"https://api.github.com/repos/rails/rails/labels/railties"
+   }
+  ],
+  "number":27221,
+  "title":"removed `@current` as it is not used"
+ },
+ {
+  "body":"### Summary\r\n\r\nThis just fixes a typo in `railties/CHANGELOG`:\r\n\r\n```\r\n*   Add Yarn support in new apps using --yarn option. This adds a package.json\r\n    and the settings needed to get npm modules integrated in new apps.\r\n\r\n    *Liceth Ovalles*, *Guillermo Iguaran*\r\n```\r\n\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27220/comments",
+  "labels":[
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   },
+   {
+    "color":"8BE06E",
+    "default":false,
+    "id":107195,
+    "name":"railties",
+    "url":"https://api.github.com/repos/rails/rails/labels/railties"
+   }
+  ],
+  "number":27220,
+  "title":"fix typo in changelog"
+ },
+ {
+  "body":"I found a test expression that not compatible with rubocop and I decided fixe it. This PR doens't fix a bug and doesn't change the documentation.\r\n\r\n=)\r\n\r\nThanks!",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27219/comments",
+  "labels":[
+   {
+    "color":"00E5FF",
+    "default":false,
+    "id":107190,
+    "name":"activemodel",
+    "url":"https://api.github.com/repos/rails/rails/labels/activemodel"
+   }
+  ],
+  "number":27219,
+  "title":"Updated test expression to unless because is more expressive"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nI have created an executable test for this bug: https://gist.github.com/ianks/ba1f7175754780168c2a6618f13c95ec\r\n\r\nI did not know whether to report this to Psych or Rails, just let me know if it belongs elsewhere and I will move the issue.\r\n\r\n### Expected behavior\r\nPsych.to_json should emit valid JSON. Currently, not all keys are double-quoted; which although valid in JS, is not valid JSON.\r\n\r\n### Actual behavior\r\nIt emits invalid json, which can be seen in this example:\r\n\r\n```json\r\n{\"raw_attributes\": {\"id\": null}, \"attributes\": {attributes: {\"id\": {name: \"id\", value_before_type_cast: null,\r\n        type: {precision: null, scale: null, limit: null, range: {\"begin\": -2147483648,\r\n            \"end\": 2147483648, \"excl\": true}}, original_attribute: null}}}, \"new_record\": true,\r\n  \"active_record_yaml_version\": 1}\r\n```\r\n### System configuration\r\n**Rails version**: 5.0.0\r\n\r\n**Ruby version**: 2.3.1\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27218/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"009800",
+    "default":false,
+    "id":126910270,
+    "name":"With reproduction steps",
+    "url":"https://api.github.com/repos/rails/rails/labels/With%20reproduction%20steps"
+   }
+  ],
+  "number":27218,
+  "title":"Psych.to_json produces invalid json for objects inherited from ActiveRecord::Base "
+ },
+ {
+  "body":"[ci skip]",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27217/comments",
+  "labels":[
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27217,
+  "title":"Fix typo in Rails 5.0 release notes \u2013\u00a0\u201cwhen when\u201d"
+ },
+ {
+  "body":"### Summary\r\n\r\nMethod simply needs to return a `PG::Connection` object. Will by default\r\nuse Active Record, but can be overridden to support other ORMs.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27216/comments",
+  "labels":[
+   {
+    "color":"bfdadc",
+    "default":false,
+    "id":300028327,
+    "name":"actioncable",
+    "url":"https://api.github.com/repos/rails/rails/labels/actioncable"
+   }
+  ],
+  "number":27216,
+  "title":"Add configuration hook for fetching Action Cable database connections"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nPUT/PATCH parameters that look like `{ id: \"1\", stuff: {\"A\" => [], \"B\" => [], \"C\" => [], \"D\" => []} }` will completely drop the `stuff` parameter by the time we're in the controller method.\r\n\r\n### Notes\r\nI've got a sample app [here](https://github.com/lukebooth/empty-array-params) with `rails-4.2` and `rails-5` branches where the tests pass and don't pass, respectively. I'm trying to figure out the differences between the rails versions that cause the empty object to be dropped.\r\n\r\nI've seen some articles and issues with parameter [deep munging](https://github.com/rails/rails/pull/16924) does that have something to do with it? If this isn't the place to bring up this issue, please close this. Thanks!\r\n\r\n### System configuration\r\n**Rails version**:\r\ntests pass in 4.2 and fail in 5.0.0.1\r\n\r\n**Ruby version**:\r\n2.2.4",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27215/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   }
+  ],
+  "number":27215,
+  "title":"Parameters with object having empty arrays as values get dropped"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\n1. Create a Rails app using Sequel and sequel-rails, without ActiveRecord\r\n2. Attempt to use the ActionCable Postgres adapter\r\n3. Watch it crash trying to autoload ActiveRecord\r\n\r\n### Expected behavior\r\n\r\nIdeally, this would support the most popular Postgres ORMs out of the box. Or at least the docs should mention that this only works with AR.\r\n\r\n### Actual behavior\r\n\r\nException trying to autoload ActiveRecord\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0.1\r\n\r\n**Ruby version**: 2.3.3\r\n\r\nIt was very easy to fork the Postgres ActionCable subscription adapter to work with Sequel. I only had to alter the `with_connection` method, which is even shorter with Sequel: https://gist.github.com/bgentry/5a4592dbbcc398c0ad651c53af7da51f#file-postgresql_sequel-rb-L35-L40\r\n\r\nI'm not sure whether the right approach is to try to support this out-of-the-box, or at least to document that the adapter is AR-specific. Thoughts?\r\n\r\nAs a user I'd certainly prefer not to have to maintain a fork of the subscription adapter. But I can certainly see the argument for this not being Rails' problem. I suppose I really only need to monkey-patch or refine that one method, though, so not too bad either way.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27214/comments",
+  "labels":[
+   {
+    "color":"bfdadc",
+    "default":false,
+    "id":300028327,
+    "name":"actioncable",
+    "url":"https://api.github.com/repos/rails/rails/labels/actioncable"
+   },
+   {
+    "color":"006b75",
+    "default":false,
+    "id":41328116,
+    "name":"attached PR",
+    "url":"https://api.github.com/repos/rails/rails/labels/attached%20PR"
+   }
+  ],
+  "number":27214,
+  "title":"ActionCable Postgres adapter is ActiveRecord-specific"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\n```ruby\r\nbegin\r\n  require \"bundler/inline\"\r\nrescue LoadError => e\r\n  $stderr.puts \"Bundler version 1.10 or later is required. Please update your Bundler\"\r\n  raise e\r\nend\r\n\r\ngemfile(true) do\r\n  source \"https://rubygems.org\"\r\n  # Activate the gem you are reporting the issue against.\r\n  gem \"activerecord\", \"5.0.0\"\r\n  gem \"sqlite3\"\r\nend\r\n\r\nrequire \"active_record\"\r\nrequire \"minitest/autorun\"\r\nrequire \"logger\"\r\n\r\n# Ensure backward compatibility with Minitest 4\r\nMinitest::Test = MiniTest::Unit::TestCase unless defined?(Minitest::Test)\r\n\r\n# This connection will do for database-independent bug reports.\r\nActiveRecord::Base.establish_connection(adapter: \"sqlite3\", database: \":memory:\")\r\nActiveRecord::Base.logger = Logger.new(STDOUT)\r\n\r\nActiveRecord::Schema.define do\r\n  create_table :posts, force: true do |t|\r\n  end\r\n\r\n  create_table :comments, force: true do |t|\r\n    t.integer :post_id\r\n    t.string :foo\r\n  end\r\nend\r\n\r\nclass Post < ActiveRecord::Base\r\n  has_many :comments\r\nend\r\n\r\nclass Comment < ActiveRecord::Base\r\n  belongs_to :post\r\n\r\n  default_scope -> { where(foo: \"bar\") }\r\nend\r\n\r\nclass BugTest < Minitest::Test\r\n  def test_join_default_scope\r\n    actual_query   = Post.joins(:comments).merge(Comment.unscoped).to_sql\r\n    expected_query = \"SELECT \\\"posts\\\".* FROM \\\"posts\\\" INNER JOIN \\\"comments\\\" ON \\\"comments\\\".\\\"post_id\\\" = \\\"posts\\\".\\\"id\\\"\"\r\n\r\n    assert_equal expected_query, actual_query\r\n  end\r\nend\r\n\r\n```\r\n\r\n### Expected behavior\r\ndefault_scope is unscoped.\r\n\r\n### Actual behavior\r\ndefault_scope isn't unscoped.\r\nSame for eager_load.\r\n\r\n### System configuration\r\nRails 5.0.0.1\r\nRuby 2.3.1p112 (2016-04-26 revision 54768) [x86_64-darwin15]\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27213/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27213,
+  "title":"Can't unscope default_scope in join"
+ },
+ {
+  "body":"### Summary\r\n\r\nThese changes:\r\n\r\n- Explicitly document `false` as one of the possible values for the `action_on_unpermitted_parameters` option. It was confusing to see it mentioned as default value without previously including it among the possible options.\r\n- Add a missing Oxford comma, honoring the API Documentation Guidelines.\r\n\r\nNote: While I've used 'filter them out' as explanation for the behavior, I'm not sure it's the best wording. Feel free to directly improve it if needed ;)",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27212/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27212,
+  "title":"Explicitly document 'false' as value for 'action_on_unpermitted_parameters'"
+ },
+ {
+  "body":"Including `ActionView::Rendering` in a controller of an API-only application breaks `render :json`, resulting in an `ActionView::MissingTemplate` error.  This is similar to #25183, except that the error occurs **without** using jbuilder.\r\n\r\n### Steps to reproduce\r\n\r\n1. Use `rails new --api` to create a Rails app with jbuilder disabled by default.\r\n2. Include `ActionView::Rendering` in a controller subclassed from `ActionController::API`, then `render :json`:\r\n\r\n```\r\nclass TestController < ActionController::API\r\n  include ActionView::Rendering\r\n\r\n  def index\r\n    render json: {page: \"Home\"}\r\n  end\r\nend\r\n```\r\n\r\n[Full example failing test](https://gist.github.com/jpettettphaxio/303edc3639c0b0820a2fff40bf3b70e3\r\n)\r\n\r\n### Expected behavior\r\nJSON response should be returned without error.  No template should be used.\r\n\r\n### Actual behavior\r\n`ActionView::MissingTemplate` is raised.\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0.1 (used `rails new --api`)\r\n\r\n**Ruby version**: 2.3.1\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27211/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   },
+   {
+    "color":"d7e102",
+    "default":false,
+    "id":3666649,
+    "name":"actionview",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionview"
+   },
+   {
+    "color":"ededed",
+    "default":false,
+    "id":128692,
+    "name":"needs feedback",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20feedback"
+   },
+   {
+    "color":"009800",
+    "default":false,
+    "id":126910270,
+    "name":"With reproduction steps",
+    "url":"https://api.github.com/repos/rails/rails/labels/With%20reproduction%20steps"
+   }
+  ],
+  "number":27211,
+  "title":"Including ActionView::Rendering in API controller without jbuilder breaks render :json"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nCreate a model with tags column like in example above and save it. Then update the column tags with a word that contains 'russian' letters only(or partially) and save it. The result will be our object with tags in ASCII-8BIT encoding.\r\n```\r\nbegin\r\n  require \"bundler/inline\"\r\nrescue LoadError => e\r\n  $stderr.puts \"Bundler version 1.10 or later is required. Please update your Bundler\"\r\n  raise e\r\nend\r\n\r\ngemfile(true) do\r\n  source \"https://rubygems.org\"\r\n  gem 'rails', '5.0.0.beta2'\r\n  gem \"pg\"\r\nend\r\n\r\nrequire \"active_record\"\r\nrequire \"minitest/autorun\"\r\nrequire \"logger\"\r\n\r\n# This connection will do for database-independent bug reports.\r\nActiveRecord::Base.establish_connection(adapter: \"postgresql\", database: \":memory:\")\r\nActiveRecord::Base.logger = Logger.new(STDOUT)\r\n\r\nActiveRecord::Schema.define do\r\n  create_table :instructors, force: true do |t|\r\n    t.string :tags, array: true, default: []\r\n  end\r\nend\r\n\r\nclass Instructor < ActiveRecord::Base\r\nend\r\n\r\nclass BugTest < Minitest::Test\r\n  def test_association_stuff\r\n    instructor = Instructor.create!(tags: ['asas', 'asdada'])\r\n    assert_equal ['asas', 'asdada'], instructor.tags\r\n\r\n    instructor.tags << '\u041f\u0440\u0438\u0432\u0435\u0442'\r\n    instructor.save\r\n    same_instructor_loaded_agin = Instructor.find(instructor.id)\r\n    assert_equal ['asas', 'asdada', '\u041f\u0440\u0438\u0432\u0435\u0442'], same_instructor_loaded_agin.tags\r\n    assert_equal ['asas', 'asdada', '\u041f\u0440\u0438\u0432\u0435\u0442'], instructor.tags\r\n  end\r\nend\r\n```\r\n### Expected behavior\r\nIt should be encoded correctly.\r\nFor example if we update with ['\u043f\u0440\u0438\u0432\u0435\u0442', 'tag1', 'tag2'] the same array is expected to be mapped back for model.\r\n\r\n### System configuration\r\nrails 5.0.0.beta2\r\nruby ruby 2.3.0p0\r\n\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27210/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"fbca04",
+    "default":false,
+    "id":70310659,
+    "name":"PostgreSQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/PostgreSQL"
+   }
+  ],
+  "number":27210,
+  "title":" Incompatible character encodings: ASCII-8BIT and UTF-8 , after updating model."
+ },
+ {
+  "body":"### Expected behavior\r\n(Time.at(1480377600) + 3.months - 3.months).to_i == 1480377600\r\n\r\n### Actual behavior\r\n(Time.at(1480377600) + 3.months - 3.months).to_i == 1480291200\r\nOff by one day, due to the 29th of February\r\n\r\n### System configuration\r\n**Rails version**:\r\n5.0.0.1\r\n\r\n**Ruby version**:\r\nruby 2.3.1p112 (2016-04-26) [x86_64-linux-gnu]\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27209/comments",
+  "labels":[
+   {
+    "color":"FC9300",
+    "default":false,
+    "id":107194,
+    "name":"activesupport",
+    "url":"https://api.github.com/repos/rails/rails/labels/activesupport"
+   }
+  ],
+  "number":27209,
+  "title":"Datetime adding and subtract does not result in the same time"
+ },
+ {
+  "body":"### Summary\r\n\r\nProvide a general description of the code changes in your pull\r\nrequest... were there any bugs you had fixed? If so, mention them. If\r\nthese bugs have open GitHub issues, be sure to tag them here as well,\r\nto keep the conversation linked together.\r\n\r\n### Other Information\r\n\r\nIf there's anything else that's important and relevant to your pull\r\nrequest, mention that information here. This could include\r\nbenchmarks, or other information.\r\n\r\nIf you are updating any of the CHANGELOG files or are asked to update the\r\nCHANGELOG files by reviewers, please add the CHANGELOG entry at the top of the file.\r\n\r\nFinally, if your pull request affects documentation or any non-code\r\nchanges, guidelines for those changes are [available\r\nhere](http://guides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation)\r\n\r\nThanks for contributing to Rails!\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27208/comments",
+  "labels":[],
+  "number":27208,
+  "title":"3 2 stable"
+ },
+ {
+  "body":"There were some places in the PostgreSQL adapter that didn't have documentation, so I added some.\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27207/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   },
+   {
+    "color":"fbca04",
+    "default":false,
+    "id":70310659,
+    "name":"PostgreSQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/PostgreSQL"
+   }
+  ],
+  "number":27207,
+  "title":"Adding more documentation for PostgreSQL adapter [ci skip]"
+ },
+ {
+  "body":"The issue affects MRI 2.2.5, MRI 2.3.3, JRuby 9.1.6.0. It can be reproduced by:\r\n\r\n```\r\n$ cd activemodel\r\n$ NO_FORK=1 bundle exec rake test\r\n```\r\n\r\nIf we wrap original arguments in quotes, it will be considered as a one big single argument. Later, [`rake/rake_test_loader.rb`](https://github.com/ruby/rake/blob/7863b97/lib/rake/rake_test_loader.rb#L15) will iterate over ARGS and try to require that huge single \"argument\" (which is a list of multiple .rb files). This leads to an exception:\r\n\r\n```\r\n/Users/kir/Project\r\ns/opensource/rails/vendor/bundle/gems/rake-11.3.0/lib/rake/rake_test_loader.rb:15:in `require': cannot load such file -- /Users/kir/Projects/opensource/rails/activemodel/test/cases/\r\nattribute_assignment_test.rb [stripped] /Users/kir/Projects/opensource/rails/activemodel/test/cases/validations/with_validation_test.rb /Users/kir/Projects/opensource/rails/activemodel/test/cases/validations_test\r\n.rb (LoadError)\r\n\r\n        from /Users/kir/Projects/opensource/rails/vendor/bundle/gems/rake-11.3.0/lib/rake/rake_test_loader.rb:15:in `block in <main>'\r\n        from /Users/kir/Projects/opensource/rails/vendor/bundle/gems/rake-11.3.0/lib/rake/rake_test_loader.rb:4:in `select'\r\n        from /Users/kir/Projects/opensource/rails/vendor/bundle/gems/rake-11.3.0/lib/rake/rake_test_loader.rb:4:in `<main>'\r\n```\r\n\r\nOriginally quotes were introduced in https://github.com/rails/rails/pull/19819 as a part of fixing `Testing::Isolation` MRI 2.2.2. That PR touches multiple lines and there're no background described about the quites. @gazay do you remember that by the chance?\r\n\r\nThe fix solves issue on all affected platforms: MRI 2.2.5, MRI 2.3.3, JRuby 9.1.6.0.\r\n\r\n@guilleiguaran @rafaelfranca ",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27206/comments",
+  "labels":[
+   {
+    "color":"FC9300",
+    "default":false,
+    "id":107194,
+    "name":"activesupport",
+    "url":"https://api.github.com/repos/rails/rails/labels/activesupport"
+   }
+  ],
+  "number":27206,
+  "title":"Fix arguments passing in testing isolation"
+ },
+ {
+  "body":"Hi!\r\nI've got stuck with unexpected behavior when creating ActiveRecord models located in subdirectories.\r\nConsider these models:\r\n```\r\n#app/models/user.rb\r\nclass User < ApplicationRecord\r\nend\r\n\r\n#app/models/man.rb\r\nclass Man < User\r\n  has_one :profile, class_name: \"Man::Profile\", dependent: :destroy, foreign_key: :users_id\r\nend\r\n\r\n#app/models/man/profile.rb\r\nclass Man::Profile < ApplicationRecord\r\n  belongs_to :man, foreign_key: :users_id\r\nend\r\n\r\n#app/models/company.rb\r\nclass Company < User\r\n  has_one :profile, class_name: \"Company::Profile\", dependent: :destroy, foreign_key: :users_id\r\nend\r\n\r\n#app/models/company/profile.rb\r\nclass Company::Profile < ApplicationRecord\r\n  belongs_to :company, foreign_key: :users_id\r\nend\r\n```\r\nI expect `table_name` for each profile would be `man/profile` and `company/profile` respectively, as `\"Man::Profile\".tableize` says, but it is actually `\"user_profiles\"`\r\n\r\nIf I use flat structure without nesting profiles in subfolders (man_profile.rb and company_profile.rb) everything is fine (`\"man_profile\"` and `\"company_profile\"` tables in this case).\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27205/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27205,
+  "title":"Trouble with table name in inherited models"
+ },
+ {
+  "body":"Addresses #22862\r\n\r\nAdded note about needing to add additional code to the setup block to get the tests to pass if you've implemented basic authorization.\r\n\r\n[ci skip]\r\n\r\ncc @cllns ",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27204/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27204,
+  "title":"Add note about step needed to get tests to pass if you implemented basic auth [ci skip]"
+ },
+ {
+  "body":"i am new in ruby and just developing my first app, i am following a tutorial on youtube, when i run the server by localhost:3000 it shows me \"Yay! You\u2019re on Rails!\". i don't know how to route it to index.html file in my home where i start developing my app. please need help i am new here",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27203/comments",
+  "labels":[],
+  "number":27203,
+  "title":"There is no index.html file in public folder"
+ },
+ {
+  "body":"Here:\r\n\r\nhttp://guides.rubyonrails.org/form_helpers.html\r\n\r\nit writes:\r\n\r\n`The second argument to options_for_select must be exactly equal to the desired internal value. In particular if the value is the integer 2 you cannot pass \"2\" to options_for_select - you must pass 2. Be aware of values extracted from the params hash as they are all strings.`\r\n\r\nHowever, I tried doing exactly this in Rails 5 and it worked. So you might want to remove this or specify it applies for older versions of Rails.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27202/comments",
+  "labels":[
+   {
+    "color":"d7e102",
+    "default":false,
+    "id":3666649,
+    "name":"actionview",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionview"
+   },
+   {
+    "color":"006b75",
+    "default":false,
+    "id":41328116,
+    "name":"attached PR",
+    "url":"https://api.github.com/repos/rails/rails/labels/attached%20PR"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27202,
+  "title":"Second arg for 'options for select' works in Rails 5"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\n * Create an active record model using the postgresql adapter that has a column of type `json`\r\n * Load an instance of the model from the database where the value of the column is `NULL`\r\n * Save the instance\r\n\r\n### Expected behavior\r\nThe column should not be included in previous_changes, since it did not change\r\n\r\n### Actual behavior\r\n`previous_changes` will be `{\"my_column\" => [nil, nil]}`\r\n\r\n### System configuration\r\n**Rails version**:\r\nRails 5.0.0.1\r\n\r\n**Ruby version**:\r\nruby 2.3.0p0 (2015-12-25 revision 53290) [x86_64-darwin15]\r\n\r\n**Notes**:\r\n\r\nThis only happens in Rails 5.  In rails 4, previous_changes would have been empty, as expected.\r\n\r\nHere is a test that passes in rails 4 but fails in rails 5, assuming you have a `users` table with a `provider_user_info` column of type `json`\r\n\r\n````\r\ndescribe ActiveRecord::Base do\r\n\r\n    describe \"previous_changes\" do\r\n\r\n        it \"should not include a json field changing from nil to nil\" do\r\n            user = User.where(provider_user_info: nil).first\r\n            user.save!\r\n\r\n            expect(user.previous_changes['provider_user_info']).to be_nil\r\n        end\r\n\r\n    end\r\n\r\nend\r\n````",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27201/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"fbca04",
+    "default":false,
+    "id":70310659,
+    "name":"PostgreSQL",
+    "url":"https://api.github.com/repos/rails/rails/labels/PostgreSQL"
+   }
+  ],
+  "number":27201,
+  "title":"Rails 5: previous_changes includes [nil, nil] entry for postrgesql json column"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\n- Have some migrations\r\n- Run `rake db:migrate`\r\n- Coworker add more migrations\r\n- Coworker runs `rake db:migrate`\r\n- The difference between the two `schema.rb` is full of added spaces, different orders etc.\r\n\r\n### Expected behavior\r\n\r\nA consistent generation of `schema.rb`, shouldn't be machine-dependent.\r\n\r\n### Actual behavior\r\n\r\n- Adds / removes extensions, spaces, etc.\r\n- Different order (views first now, views last before, for instance).\r\n\r\n### Proposed solution\r\n\r\nHaving a `schema.rb` formatter would be nice a a post-processing step after its generation using a similar concept as `rubocop -a` for instance.\r\n\r\nI think It would be far more difficult to have an actual consistent generation as its derived from the database.\r\n\r\n### System configuration\r\n**Rails version**: 5.0.0\r\n\r\n**Ruby version**: 2.3.2\r\n\r\n**Postgres version**: 9.5.5\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27200/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27200,
+  "title":"Consistent generation of schema.rb"
+ },
+ {
+  "body":"Remove mention of outdated [blog post](http://weblog.jamisbuck.org/2007/2/5/nesting-resources) from routing docs, [next section](http://guides.rubyonrails.org/routing.html#shallow-nesting) already speaks about how to avoid deep nesting.\r\n\r\nThe paragraph was updated including:\r\n\r\n> TIP: Resources should never be nested more than 1 level deep.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27199/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27199,
+  "title":"Remove reference to outdated blog post."
+ },
+ {
+  "body":"### Summary\r\n\r\nCurrenty, ActionController::Parameters dosen't have #reverse_merge and #reverse_merge!.\r\n\r\nBy using reverse_merge, you can write behaviors like default values.\r\n\r\n```ruby\r\n# before\r\nparams[:age] = 30 unless params[:age]\r\n\r\n# after\r\nparams.reverse_merge(age: 30)\r\n```\r\n\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27198/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   },
+   {
+    "color":"ededed",
+    "default":false,
+    "id":128692,
+    "name":"needs feedback",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20feedback"
+   }
+  ],
+  "number":27198,
+  "title":"add ActionController::Parameters#reverse_merge"
+ },
+ {
+  "body":"### Summary\r\n\r\nThe `Renderer#with_defaults` method was introduced in\r\nhttps://github.com/rails/rails/commit/2db7304c2c338711b265e92a51d29121cbd702e6\r\nwith the intent of enabling a new renderer to be created with new\r\ndefaults passed in. However, the method is broken as it references\r\n`env`, which is not available, thus throwing an error.\r\n\r\nWhile throwing the error can be fixed either by referencing the\r\n`@env` instance variable (or creating an `attr_reader` for it), the\r\nmethod will still not perform as expected since `env` already has the\r\ndefaults merged in (via the initializer). The only way for it to work\r\nwould be to call `normalize_keys(env.merge(defaults))`, ie:\r\n\r\n```\r\ndef with_defaults(defaults)\r\n  self.class.new controller, normalize_keys(env.merge(defaults)), self.defaults.merge(defaults)\r\nend\r\n```\r\n\r\nIt feels like that would be a much more confusing API, though.\r\n\r\nThis PR opts to remove the method, without entering a deprecation cycle\r\nsince it is already broken.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27197/comments",
+  "labels":[
+   {
+    "color":"FFF700",
+    "default":false,
+    "id":107189,
+    "name":"actionpack",
+    "url":"https://api.github.com/repos/rails/rails/labels/actionpack"
+   },
+   {
+    "color":"ededed",
+    "default":false,
+    "id":128692,
+    "name":"needs feedback",
+    "url":"https://api.github.com/repos/rails/rails/labels/needs%20feedback"
+   }
+  ],
+  "number":27197,
+  "title":"Remove broken Renderer#with_defaults method"
+ },
+ {
+  "body":"Since we have `.rubocop` and ask new PRs to satisfy Rubocop rules, I think it's worth having rubocop in the Gemfile.\r\n\r\n@rafaelfranca ",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27196/comments",
+  "labels":[],
+  "number":27196,
+  "title":"Add rubocop to Gemfile"
+ },
+ {
+  "body":"Follow up to #18767",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27195/comments",
+  "labels":[],
+  "number":27195,
+  "title":"use public Module#include instead of send :include"
+ },
+ {
+  "body":"I am running the following:\r\n\r\nruby -v\r\nruby 2.3.1p112 (2016-04-26 revision 54768) [x86_64-linux]\r\n\r\ngems are:\r\n\r\nactiverecord (5.0.0.1)\r\nsqlite3 (1.3.12)\r\n\r\nThe table create is:\r\n\r\nCREATE TABLE \"member_statuses\" (\"member_statuses_key\" INTEGER PRIMARY KEY   ,\"members_key\" integer  ,\"board_member\" text(1) DEFAULT 'N'  ,\"membership_categories_key\" integer  ,\"membership_expiration\" date  ,\"paid_member\" text(1) DEFAULT 'N'  ,\"inactive\" text(1) DEFAULT 'N'  );\r\n\r\nThe ruby program has:\r\n\r\n  class Member_status < ActiveRecord::Base\r\n    self.primary_key = 'member_statuses_key'\r\n    belongs_to :membership_category, :class_name => 'Membership_category',\r\n               :foreign_key=> 'membership_categories_key'\r\n  end\r\n\r\n  class Membership_category < ActiveRecord::Base\r\n    self.primary_key = 'membership_categories_key'\r\n    has_many :member_statuses, :class_name => 'Member_status'\r\n  end \r\n\r\nFrom withing the program Typing Member_status shows all columns.\r\n\r\nMember_status(member_statuses_key: integer, members_key: integer, board_member: text, membership_categories_key: integer, membership_expiration: date, paid_member: text, inactive: text)\r\n\r\nBut entering Member_status.column_names members_key is missing.\r\n\r\n[\"board_member\", \"membership_categories_key\", \"membership_expiration\", \"paid_member\", \"inactive\"]\r\n\r\nSo if I run the following:\r\n\r\n      r = Member_statuses.create(fields)\r\n      ret2 = r.save\r\n\r\nwhere fields = {\"board_member\"=>\"N\", \"membership_categories_key\"=>8, \"membership_expiration\"=>\"2015-12-31\", \"paid_member\"=>\"N\", \"inactive\"=>\"N\", \"members_key\"=>393}\r\n\r\nThe table has members_key as null\r\n\r\nIf I run the command from sqlite3\r\n\r\n INSERT INTO MEMBER_STATUSES ( board_member, membership_categories_key, membership_expiration, paid_member, inactive, members_key) VALUES ( 'N', 8, '2015-12-31', 'N', 'N', 392 );\r\n\r\nThis can be seen from a sqlite3 select.\r\n\r\nselect * from member_statuses where member_statuses_key>391;\r\n\r\n392|392|N|8|2015-12-31|N|N\r\n393||N|8|2015-12-31|N|N\r\n\r\nThis did work with older gems. I do not know the versions that worked.\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27194/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27194,
+  "title":"activerecord table missing column"
+ },
+ {
+  "body":"fixes #27192",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27193/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27193,
+  "title":"fixing update_all and delete_all when chained with left_joins"
+ },
+ {
+  "body":"### Steps to reproduce\r\n\r\nGiven a case when `Pet.has_many :toys`, the following delete_all and update_all fails:\r\n\r\n```ruby\r\nPet.left_joins(:toys).where(:toys => {:name => 'Bone'}).update_all(name: \"Bob\")\r\nPet.left_joins(:toys).where(:toys => {:name => 'Bone'}).delete_all\r\n```\r\n\r\nBecause current Arel implementation ignores left joins when checking if it should join tables.\r\n\r\n### Expected behavior\r\nThe relation should be update/deleted\r\n\r\n### Actual behavior\r\nThe generated query is invalid\r\n\r\n### System configuration\r\n**Rails version**: 5\r\n**Ruby version**: any\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27192/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"006b75",
+    "default":false,
+    "id":41328116,
+    "name":"attached PR",
+    "url":"https://api.github.com/repos/rails/rails/labels/attached%20PR"
+   }
+  ],
+  "number":27192,
+  "title":"update_all and delete_all doesn't work when chained with left_joins"
+ },
+ {
+  "body":"Extracted from #23211.\r\n\r\nExample:\r\n\r\n```ruby\r\nclass ChatChannelTest < ActionCable::Channel::TestCase\r\n  def test_subscribed_with_room_number\r\n    # Simulate a subscription creation\r\n    subscribe room_number: 1\r\n\r\n    # Asserts that the subscription was successfully created\r\n    assert subscription.confirmed?\r\n\r\n    # Asserts that the channel subscribes connection to a stream\r\n    assert \"chat_1\", streams.last\r\n  end\r\n  \r\n  def test_subscribed_without_room_number\r\n     subscribe\r\n\r\n     # Asserts that the subscription was rejected\r\n     assert subscription.rejected?\r\n  end\r\n  \r\n  def test_perform_speak\r\n    subscribe room_number: 1\r\n\r\n    perform :speak, message: \"Hello, Rails!\"\r\n    \r\n    assert_equal \"Hello, Rails!\", transmissions.last[\"message\"][\"text\"]\r\n  end\r\nend\r\n```",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27191/comments",
+  "labels":[
+   {
+    "color":"bfdadc",
+    "default":false,
+    "id":300028327,
+    "name":"actioncable",
+    "url":"https://api.github.com/repos/rails/rails/labels/actioncable"
+   }
+  ],
+  "number":27191,
+  "title":"ActionCable channels unit-testing"
+ },
+ {
+  "body":"### Summary\r\n\r\nProvide a general description of the code changes in your pull\r\nrequest... were there any bugs you had fixed? If so, mention them. If\r\nthese bugs have open GitHub issues, be sure to tag them here as well,\r\nto keep the conversation linked together.\r\n\r\n### Other Information\r\n\r\nIf there's anything else that's important and relevant to your pull\r\nrequest, mention that information here. This could include\r\nbenchmarks, or other information.\r\n\r\nIf you are updating any of the CHANGELOG files or are asked to update the\r\nCHANGELOG files by reviewers, please add the CHANGELOG entry at the top of the file.\r\n\r\nFinally, if your pull request affects documentation or any non-code\r\nchanges, guidelines for those changes are [available\r\nhere](http://guides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation)\r\n\r\nThanks for contributing to Rails!\r\n\r\n",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27190/comments",
+  "labels":[
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27190,
+  "title":"I found this issue and wanted to give the fix."
+ },
+ {
+  "body":"### Steps to reproduce\r\nAs in the start of the guide, change the article_edit view's form to like \r\n```ruby\r\n<%= form_for(:post, url: post_path(@post), method: :patch) do |f| %>\r\n```\r\n\r\nTry to submit the edit form with the title length less than 5\r\n\r\n### Expected behavior\r\nOn submitting the form the following error will be raised\r\nActionController::UrlGenerationError in Articles#update\r\n\r\nthe full traceback\r\n```\r\nActionController::UrlGenerationError in Posts#update\r\nShowing D:/SourceCodesAll/ruby/rails_starter/blog/app/views/posts/edit.erb where line #3 raised:\r\n\r\nNo route matches {:action=>\"show\", :controller=>\"posts\", :id=>nil} missing required keys: [:id]\r\nRails.root: D:/SourceCodesAll/ruby/rails_starter/blog\r\n\r\nApplication Trace | Framework Trace | Full Trace\r\napp/views/posts/edit.erb:3:in `_app_views_posts_edit_erb__9863216_77879280'\r\napp/controllers/posts_controller.rb:32:in `update'\r\nRequest\r\n\r\nParameters:\r\n\r\n{\"utf8\"=>\"\u2713\",\r\n \"_method\"=>\"patch\",\r\n \"authenticity_token\"=>\"S7tRNCapaUmzxi4w4B1i5/kV2aAya6GbpSF/40vMiwk1d7ONkw054I8mqk8ZV8XzDrdUFN9CW1bi/pxuvqNQfA==\",\r\n \"post\"=>{\"title\"=>\"erer\",\r\n \"body\"=>\"cgccgfg\"},\r\n \"commit\"=>\"Save Post\",\r\n \"id\"=>\"4\"}\r\n```\r\n\r\n### Actual behavior\r\nIt should show the edit form again with error message that the title length should have length 5 or more\r\n\r\n### System configuration\r\n**Rails version**:\r\n4.2.5.1\r\n**Ruby version**:\r\n2.2.0",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27189/comments",
+  "labels":[
+   {
+    "color":"006b75",
+    "default":false,
+    "id":41328116,
+    "name":"attached PR",
+    "url":"https://api.github.com/repos/rails/rails/labels/attached%20PR"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27189,
+  "title":"Getting Started Guide: "
+ },
+ {
+  "body":"### test, don't connect to mysql when running sqlite3 tests.\r\n\r\nResolves the following:\r\n\r\n```\r\nError:\r\nTestAdapterWithInvalidConnection#test_inspect_on_Model_class_does_not_raise:\r\nGem::LoadError: Specified 'mysql' for database adapter, but the gem is not loaded. Add `gem 'mysql'` to your Gemfile (and ensure its version is at the minimum required by ActiveRecord).\r\n    /home/oz/code/rails/activerecord/lib/active_record/connection_adapters/connection_specification.rb:177:in `rescue in spec'\r\n    /home/oz/code/rails/activerecord/lib/active_record/connection_adapters/connection_specification.rb:174:in `spec'\r\n    /home/oz/code/rails/activerecord/lib/active_record/connection_handling.rb:50:in `establish_connection'\r\n    /home/oz/code/rails/activerecord/test/cases/invalid_connection_test.rb:12:in `setup'\r\n```\r\n\r\nPorts 4b1f67a11a6fd5680a7ce37b695a4d86e6a2c302",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27188/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   }
+  ],
+  "number":27188,
+  "title":"test, don't connect to mysql when running sqlite3 tests."
+ },
+ {
+  "body":"PostgreSQL cares about valid UUID, and `a0eebc99-9c0b-4ef8-fb6d-6bb9bd380a11`\nis valid UUID. There's other versions other than the more popular\nversion 4, and so PostgreSQL's `uuid` type doesn't enforce a specific\nversion. It will accept any string that passes the general UUID validity\ncheck.",
+  "comments_url":"https://api.github.com/repos/rails/rails/issues/27187/comments",
+  "labels":[
+   {
+    "color":"0b02e1",
+    "default":false,
+    "id":107191,
+    "name":"activerecord",
+    "url":"https://api.github.com/repos/rails/rails/labels/activerecord"
+   },
+   {
+    "color":"02d7e1",
+    "default":false,
+    "id":150377,
+    "name":"docs",
+    "url":"https://api.github.com/repos/rails/rails/labels/docs"
+   }
+  ],
+  "number":27187,
+  "title":"Remove wrong comment about PostgreSQL and UUIDs"
+ }
+]
